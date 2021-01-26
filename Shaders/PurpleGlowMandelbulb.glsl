@@ -3,6 +3,9 @@ precision mediump float;
 uniform float time;
 uniform vec2 resolution;
 uniform float fractalIncrementer;
+uniform float uperBoundsr;
+uniform float uperBoundsg;
+uniform float uperBoundsb;
 
 #define NEAR 0.0
 #define FAR 100.0
@@ -120,9 +123,9 @@ void main()
 
     if(grayScale != 0.0)
     {
-        float r = map(grayScale, 0.0, 1.0, 0.54, 0.0);
-        float g = map(grayScale, 0.0, 1.0, 0.17, 0.0);
-        float b = map(grayScale, 0.0, 1.0, 0.88, 0.0);
+        float r = map(grayScale, 0.0, 1.0, uperBoundsr, 0.0);
+        float g = map(grayScale, 0.0, 1.0, uperBoundsg, 0.0);
+        float b = map(grayScale, 0.0, 1.0, uperBoundsb, 0.0);
 
         gl_FragColor = vec4(r, g, b, 1.0);
     }

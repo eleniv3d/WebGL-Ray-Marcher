@@ -1,5 +1,11 @@
 var mesh, timer, shaderProgram;
 
+var colors = new function() {
+	this.r = 0.5;
+	this.g = 0.5;
+	this.b = 0.5;
+}
+
 // start() is the main function that gets called first by index.html
 var start = function() {
     
@@ -38,7 +44,14 @@ var initCanvas = function() {
 
 	gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); 
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    var gui = new dat.GUI();
+
+    var folder = gui.addFolder('colors');
+	folder.add(colors, 'r', 0.0, 1.0);
+    folder.add(colors, 'b', 0.0, 1.0);
+    folder.add(colors, 'g', 0, 1.0);
 }
 
 var drawScene = function() {
@@ -56,10 +69,16 @@ var drawScene = function() {
     // Update the timer
     timer.Update();
 
+
     // Set uniform values of the fragment shader
     shaderProgram.SetUniformVec2("resolution", [gl.canvas.width, gl.canvas.height]);
     shaderProgram.SetUniform1f("time", timer.GetTicksInRadians());
     shaderProgram.SetUniform1f("fractalIncrementer", timer.GetFractalIncrement());
+
+    shaderProgram.SetUniform1f("uperBoundsr", colors.r);
+    shaderProgram.SetUniform1f("uperBoundsg", colors.g);
+    shaderProgram.SetUniform1f("uperBoundsb", colors.b);
+
     
     // Tell WebGL to draw the scene
     mesh.Draw();
