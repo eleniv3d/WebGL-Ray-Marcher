@@ -11,6 +11,10 @@ var scales = new function() {
     this.gyroidB = 0.00;
 }
 
+var shader = new function() {
+	this.type = "gyroid";
+}
+
 // start() is the main function that gets called first by index.html
 var start = function() {
     
@@ -60,9 +64,16 @@ var initCanvas = function() {
     folder.add(colors, 'b', 0.0, 1.0);
     folder.add(colors, 'g', 0, 1.0);
 
-    var folder = gui.addFolder('scales');
-    folder.add(scales, 'gyroidA', -3.00, 3.00);
-    folder.add(scales, 'gyroidB', -3.00, 3.00);
+    var folder2 = gui.addFolder('scales');
+    folder2.add(scales, 'gyroidA', -3.00, 3.00);
+    folder2.add(scales, 'gyroidB', -3.00, 3.00);
+
+    var folder3 = gui.addFolder('shader');
+	folder3.add(shader, 'type', ["gyroid", "mandelbulb", "spheres"]).onChange( function () {
+
+		switchShader(shader)
+		
+	} );
 }
 
 var drawScene = function() {
@@ -99,6 +110,24 @@ var drawScene = function() {
     // Tell WebGL to draw the scene
     mesh.Draw();
 }
+
+//switch between different shaders
+
+function switchShader() {
+
+	if (shader.type == "mandelbulb"){
+       frag = 'fragShader2' 
+    }else if(shader.type == "gyroid"){
+        frag = 'fragShader'
+    }else if(shader.type =="spheres"){
+        frag = 'fragShader3'
+    }
+    shaderProgram = new Shader('vertShader', frag);
+    // Activate the shader program
+    shaderProgram.UseProgram();
+
+}
+
 
 // resizes canvas to fit browser window
 var resize = function(canvas) {
