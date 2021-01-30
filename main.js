@@ -6,6 +6,11 @@ var colors = new function() {
 	this.b = 0.5;
 }
 
+var scales = new function() {
+    this.gyroidA = -1.00;
+    this.gyroidB = 0.00;
+}
+
 // start() is the main function that gets called first by index.html
 var start = function() {
     
@@ -21,10 +26,12 @@ var start = function() {
     shaderProgram.UseProgram();
 
     // Set vertices of the mesh to be the canonical screen space
-    var vertices = [-1.0, -1.0,
-                     1.0,  1.0,
-                    -1.0,  1.0,
-                     1.0, -1.0];
+    var vertices = [
+        -1.0, -1.0,
+        1.0,  1.0,
+        -1.0,  1.0,
+        1.0, -1.0
+    ];
     
     // Set indices for the vertices above
     var indices = [2, 0, 1,
@@ -52,6 +59,10 @@ var initCanvas = function() {
 	folder.add(colors, 'r', 0.0, 1.0);
     folder.add(colors, 'b', 0.0, 1.0);
     folder.add(colors, 'g', 0, 1.0);
+
+    var folder = gui.addFolder('scales');
+    folder.add(scales, 'gyroidA', -3.00, 3.00);
+    folder.add(scales, 'gyroidB', -3.00, 3.00);
 }
 
 var drawScene = function() {
@@ -79,7 +90,12 @@ var drawScene = function() {
     shaderProgram.SetUniform1f("uperBoundsg", colors.g);
     shaderProgram.SetUniform1f("uperBoundsb", colors.b);
 
-    
+    shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
+    shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidB) );
+
+    console.log(Math.pow(10., scales.gyroidA) );
+    console.log(Math.pow(10., scales.gyroidB) );
+
     // Tell WebGL to draw the scene
     mesh.Draw();
 }
