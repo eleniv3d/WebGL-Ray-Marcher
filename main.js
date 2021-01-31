@@ -110,11 +110,16 @@ var drawScene = function() {
     shaderProgram.SetUniformColor("color1", color1);
     shaderProgram.SetUniformColor("color2", color2);
 
-    shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
-    shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidB) );
+    shaderProgram.SetUniformVec2("gyroidScales", [
+        Math.pow(10., scales.gyroidA),
+        Math.pow(10., scales.gyroidB)
+    ]);
 
-    console.log(Math.pow(10., scales.gyroidA) );
-    console.log(Math.pow(10., scales.gyroidB) );
+    // shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
+    // shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidA) );
+
+    // console.log(Math.pow(10., scales.gyroidA) );
+    // console.log(Math.pow(10., scales.gyroidB) );
 
     // Tell WebGL to draw the scene
     mesh.Draw();

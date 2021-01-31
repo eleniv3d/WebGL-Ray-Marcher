@@ -12,17 +12,7 @@ const float tau = 6.2831853072;
 const float staticZ = 0.;
 
 // function parameters
-uniform float scaleGyroidA;
-uniform float scaleGyroidB;
-
-// const float scaleGyroidA = .02;
-// const float scaleGyroidB = .5;
-
-float sGA = .01;
-float sGB = 1.;
-
-// float sGA = scaleGyroidA;
-// float sGB = scaleGyroidB;
+uniform vec2 gyroidScales;
 
 // color scheme
 uniform vec3 color1;
@@ -36,7 +26,7 @@ float sdGyroid(vec3 p, float scale) {
 }
 
 float GetDist(vec3 p) {
-    float d_g = sdGyroid(p, sGB * sdGyroid(p, sGA) );
+    float d_g = sdGyroid(p, gyroidScales.x * sdGyroid(p, gyroidScales.y) );
 
     return d_g;
 }
@@ -78,7 +68,7 @@ void main()
 
     // vec3 col = vec3(GetNormal(fragCoord) );
     
-    float d = GetDist(vec3(gl_FragCoord.xy, 0), sGA, sGB);
+    float d = GetDist(vec3(gl_FragCoord.xy, 0), gyroidScales.x, gyroidScales.y);
     vec3 n = colorFromDistance(d);
 
     gl_FragColor = vec4(n, 1.);
