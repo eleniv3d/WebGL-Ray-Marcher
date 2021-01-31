@@ -13,9 +13,10 @@ var color2 = new function() {
 }
 
 var scales = new function() {
-    this.gyroidA = -1.00;
+    this.gyroidA = -2.00;
     this.gyroidB = 0.00;
     this.zHeight = 0.;
+    this.steps = 8;
 }
 
 var shader = new function() {
@@ -79,10 +80,16 @@ var initCanvas = function() {
     var folder3 = gui.addFolder('scales');
     folder3.add(scales, 'gyroidA', -3.00, 3.00);
     folder3.add(scales, 'gyroidB', -3.00, 3.00);
-    folder3.add(scales, 'zHeight', -3.00, 3.00);
+    folder3.add(scales, 'zHeight', -10.00, 10.00);
+    folder3.add(scales, 'steps', 2, 10);
 
     var folder4 = gui.addFolder('shader');
-	folder4.add(shader, 'type', ["gyroid", "mandelbulb", "spheres", "clouded"]).onChange( function () {
+	folder4.add(shader, 'type', [
+        "gyroid",
+        "mandelbulb",
+        "spheres",
+        "clouded"
+    ]).onChange( function () {
 
 		switchShader(shader)
 	} );
@@ -118,6 +125,7 @@ var drawScene = function() {
     ]);
 
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
+    shaderProgram.SetUniform1f("steps", Math.round(scales.steps) );
 
     // shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
     // shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidA) );
@@ -137,9 +145,9 @@ function switchShader() {
        frag = 'fragShader2' 
     }else if(shader.type == "gyroid"){
         frag = 'fragShader'
-    }else if(shader.type =="spheres"){
+    }else if(shader.type == "spheres"){
         frag = 'fragShader3'
-    }else if(shader.type =="clouded"){
+    }else if(shader.type == "clouded"){
         frag = 'fragShader4'
     }
     shaderProgram = new Shader('vertShader', frag);
