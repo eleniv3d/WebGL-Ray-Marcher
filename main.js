@@ -24,6 +24,12 @@ color8 = HSVtoRGB(params.color8);
 color9 = HSVtoRGB(params.color9);
 color10 = HSVtoRGB(params.color10);
 
+var scales = new function () {
+    this.gyroidA = -1.80;
+    this.gyroidB = -1.00;
+    this.zHeight = 0.;
+}
+
 var abstractionLevel = new function () {
     this.steps = 8;
     this.resolution = 1.;
@@ -92,7 +98,6 @@ var initCanvas = function () {
     var gui = new dat.GUI();
 
     var folder = gui.addFolder('colors');
-
     hsv1 = folder.addColor(params, 'color1');
     hsv2 = folder.addColor(params, 'color2');
     hsv3 = folder.addColor(params, 'color3');
@@ -224,11 +229,6 @@ var drawScene = function () {
     shaderProgram.SetUniform1f("time", timer.GetTicksInRadians());
     shaderProgram.SetUniform1f("fractalIncrementer", timer.GetFractalIncrement());
 
-    console.log(color1);
-    console.log(color2);
-    console.log(color3);
-    console.log(color4);
-
     shaderProgram.SetUniformColor("color1", color1);
     shaderProgram.SetUniformColor("color2", color2);
     shaderProgram.SetUniformColor("color3", color3);
@@ -246,7 +246,7 @@ var drawScene = function () {
     ]);
 
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
-    shaderProgram.SetUniform1f("steps", Math.round(scales.steps) - 1. );
+    shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1. );
     shaderProgram.SetUniformVec3("pixelResolution", [
         abstractionLevel.resolution, 
         abstractionLevel.resolution, 
@@ -255,14 +255,6 @@ var drawScene = function () {
     
     shaderProgram.SetUniform1f("alpha", transformation.rz);
     shaderProgram.SetUniformVec3("mvVec", [Math.pow(10., transformation.x), Math.pow(10., transformation.y), Math.pow(10., transformation.z) ]);
-
-    // console.log("steps : " + (powF(transformation.x)) + " - " + (transformation.x) );
-
-    // shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
-    // shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidA) );
-
-    // console.log(Math.pow(10., scales.gyroidA) );
-    // console.log(Math.pow(10., scales.gyroidB) );
 
     // Tell WebGL to draw the scene
     mesh.Draw();
