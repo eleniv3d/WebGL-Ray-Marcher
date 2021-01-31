@@ -19,6 +19,17 @@ var scales = new function() {
     this.steps = 8;
 }
 
+var transformation = new function() {
+    this.x = 0.0;
+    this.y = 0.0;
+    this.z = 0.0;
+    this.rz = 0.0;
+}
+
+function powF(value) {
+    return Math.pow(10., value) - 1.0;
+}
+
 var shader = new function() {
 	this.type = "gyroid";
 }
@@ -83,8 +94,14 @@ var initCanvas = function() {
     folder3.add(scales, 'zHeight', -1000.00, 1000.00);
     folder3.add(scales, 'steps', 2, 10);
 
-    var folder4 = gui.addFolder('shader');
-	folder4.add(shader, 'type', [
+    var folder4 = gui.addFolder('moving');
+    folder4.add(transformation, 'x', 0., 5.);
+    folder4.add(transformation, 'y', 0., 5.);
+    folder4.add(transformation, 'z', 0., 5.);
+    folder4.add(transformation, 'rz', -3.1415927, 3.1415927);
+
+    var folder5 = gui.addFolder('shader');
+	folder5.add(shader, 'type', [
         "gyroid",
         "mandelbulb",
         "spheres",
@@ -127,7 +144,10 @@ var drawScene = function() {
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
     shaderProgram.SetUniform1f("steps", Math.round(scales.steps) - 1. );
     
-    console.log("steps : " + (Math.round(scales.steps) - 1.) );
+    shaderProgram.SetUniform1f("alpha", transformation.rz);
+    shaderProgram.SetUniformVec3("mvVec", [Math.pow(10., transformation.x), Math.pow(10., transformation.y), Math.pow(10., transformation.z) ]);
+
+    // console.log("steps : " + (powF(transformation.x)) + " - " + (transformation.x) );
 
     // shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
     // shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidA) );

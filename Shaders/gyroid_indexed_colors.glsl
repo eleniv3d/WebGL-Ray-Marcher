@@ -22,6 +22,27 @@ uniform float steps;
 // color scheme
 uniform vec3 color1;
 uniform vec3 color2;
+uniform vec3 color3;
+uniform vec3 color4;
+uniform vec3 color5;
+uniform vec3 color6;
+uniform vec3 color7;
+uniform vec3 color8;
+uniform vec3 color9;
+uniform vec3 color10;
+
+vec3[] colors = vec3[
+    color1,
+    color2,
+    color3,
+    color4,
+    color5,
+    color6,
+    color7,
+    color8,
+    color9,
+    color10,
+]
 
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
@@ -47,10 +68,8 @@ float GetDist(vec2 p) {
 }
 
 vec3 colorFromDistance(float d) {
-    float dRemap = float(floor( ( d * .5 + .5) * steps + .5 ) ) / steps;
-    vec3 color = mix(color1,color2, dRemap );
-
-    return color;
+    int cIdx = int(float(floor( ( d * .5 + .5) * steps + .5 ) ) / steps);
+    return colors[cIdx];
 }
 
 vec3 translate(vec3 p, vec3 mv) {
