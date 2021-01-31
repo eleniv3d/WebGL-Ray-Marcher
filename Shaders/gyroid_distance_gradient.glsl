@@ -76,6 +76,7 @@ vec3 rotate(vec3 p) {
 void main()
 {
     vec3 p = translate( rotate( vec3(gl_FragCoord.xy, zHeight) ) );
+    p = p - mod(p, vec3(1.) );
     float d = GetDist(p);
     
     vec3 n = colorFromDistance(d * 2.);

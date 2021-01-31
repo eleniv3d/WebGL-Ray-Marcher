@@ -31,18 +31,8 @@ uniform vec3 color8;
 uniform vec3 color9;
 uniform vec3 color10;
 
-vec3[] colors = vec3[
-    color1,
-    color2,
-    color3,
-    color4,
-    color5,
-    color6,
-    color7,
-    color8,
-    color9,
-    color10,
-]
+// resolution
+uniform vec3 pixelResolution;
 
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
@@ -68,8 +58,32 @@ float GetDist(vec2 p) {
 }
 
 vec3 colorFromDistance(float d) {
-    int cIdx = int(float(floor( ( d * .5 + .5) * steps + .5 ) ) / steps);
-    return colors[cIdx];
+    int cIdx = int(float(floor( ( d * .5 + .5) * steps + .5 ) ) );
+    vec3 color;
+    if (cIdx == 0) {
+        color = color1;
+    } else if (cIdx == 1) {
+        color = color2;
+    } else if (cIdx == 2) {
+        color = color3;
+    } else if (cIdx == 3) {
+        color = color4;
+    } else if (cIdx == 4) {
+        color = color5;
+    } else if (cIdx == 5) {
+        color = color6;
+    } else if (cIdx == 6) {
+        color = color7;
+    } else if (cIdx == 7) {
+        color = color8;
+    } else if (cIdx == 8) {
+        color = color9;
+    } else if (cIdx == 9) {
+        color = color10;
+    } else {
+        color = vec3(1.0);
+    }
+    return color;
 }
 
 vec3 translate(vec3 p, vec3 mv) {
@@ -95,6 +109,7 @@ vec3 rotate(vec3 p) {
 void main()
 {
     vec3 p = translate( rotate( vec3(gl_FragCoord.xy, zHeight) ) );
+    p = p - mod(p, pixelResolution);
     float d = GetDist(p);
     
     vec3 n = colorFromDistance(d * 2.);
