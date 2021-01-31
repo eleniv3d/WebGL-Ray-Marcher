@@ -57,16 +57,16 @@ vec3 GetNormal(vec3 p) {
 }
 
 vec3 colorFromDistance(float d) {
-    vec3 color = mix(color1,color2,d * .5 + .5);
+    vec3 color = mix(color1,color2,floor( (d * .5 + .5) * steps + .5) / steps );
 
     return color;
 }
 
 void main()
 {
-    float d = GetDist(vec3(gl_FragCoord.xy, zHeight) ) * steps;
-    float stepped = floor( (d * steps) );
-    vec3 n = colorFromDistance(stepped / steps);
+    float d = GetDist(vec3(gl_FragCoord.xy, zHeight) );
+    
+    vec3 n = colorFromDistance(d);
 
     gl_FragColor = vec4(n, 1.);
 }

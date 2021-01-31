@@ -14,7 +14,7 @@ var color2 = new function() {
 
 var scales = new function() {
     this.gyroidA = -2.00;
-    this.gyroidB = 0.00;
+    this.gyroidB = -1.00;
     this.zHeight = 0.;
     this.steps = 8;
 }
@@ -125,7 +125,9 @@ var drawScene = function() {
     ]);
 
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
-    shaderProgram.SetUniform1f("steps", Math.round(scales.steps) );
+    shaderProgram.SetUniform1f("steps", Math.round(scales.steps) - 1. );
+    
+    console.log("steps : " + (Math.round(scales.steps) - 1.) );
 
     // shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
     // shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidA) );
