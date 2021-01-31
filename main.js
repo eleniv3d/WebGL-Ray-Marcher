@@ -110,74 +110,43 @@ var initCanvas = function () {
     hsv10 = folder.addColor(params, 'color10');
 
     hsv1.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color1.r = bg[0];
-        color1.g = bg[1];
-        color1.b = bg[2];
-
+        color1 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color2.r = bg[0];
-        color2.g = bg[1];
-        color2.b = bg[2];
+    hsv2.onChange(function(value) {   
+        color2 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color3.r = bg[0];
-        color3.g = bg[1];
-        color3.b = bg[2];
+    hsv3.onChange(function(value) {        
+        color3 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color4.r = bg[0];
-        color4.g = bg[1];
-        color4.b = bg[2];
+    hsv4.onChange(function(value) {        
+        color4 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color5.r = bg[0];
-        color5.g = bg[1];
-        color5.b = bg[2];
+    hsv5.onChange(function(value) {        
+        color5 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color6.r = bg[0];
-        color6.g = bg[1];
-        color6.b = bg[2];
+    hsv6.onChange(function(value) {        
+        color6 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color7.r = bg[0];
-        color7.g = bg[1];
-        color7.b = bg[2];
+    hsv7.onChange(function(value) {        
+        color7 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color8.r = bg[0];
-        color8.g = bg[1];
-        color8.b = bg[2];
+    hsv8.onChange(function(value) {        
+        color8 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color9.r = bg[0];
-        color9.g = bg[1];
-        color9.b = bg[2];
+    hsv9.onChange(function(value) {        
+        color9 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {        
-        bg = HSVtoRGB(value);
-        color10.r = bg[0];
-        color10.g = bg[1];
-        color10.b = bg[2];
+    hsv10.onChange(function(value) {        
+        color10 = HSVtoRGB(value);
     });
 
     var folder3 = gui.addFolder('scales');
@@ -248,9 +217,9 @@ var drawScene = function () {
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
     shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1. );
     shaderProgram.SetUniformVec3("pixelResolution", [
-        abstractionLevel.resolution, 
-        abstractionLevel.resolution, 
-        abstractionLevel.resolution
+        Math.floor(abstractionLevel.resolution), 
+        Math.floor(abstractionLevel.resolution), 
+        Math.floor(abstractionLevel.resolution)
     ] );
     
     shaderProgram.SetUniform1f("alpha", transformation.rz);
