@@ -21,6 +21,33 @@
 				text-align:center;
 				z-index:1000;
 			}
+			.head {position: fixed; font-size: 25px}
+			.dg.main .close-button {
+				background-color: rgb(255, 0, 255);
+			}
+			.ui { 
+				position : fixed;
+				display: inline-block;
+				margin: 0.5em 0.5em 0.5em 0.5em;
+				border-radius:0.12em;
+				border: 0.1em solid #FFFFFF;
+				color: white;
+				background: transparent; 
+				padding: 0.35em 1.2em;
+				text-align: center;
+				box-sizing: border-box;
+				text-decoration:none;
+				font-family:'Roboto',sans-serif;
+				font-weight:300;
+				font-size: 0.9em;
+				cursor: pointer;
+			}
+			.ui:hover {
+			color:#000000;
+			background-color: #FFFFFF;
+			}
+
+			 
 		</style>
     </head>
     <body onload = "start();">
@@ -39,6 +66,9 @@
 		<script type="text/javascript" src="./Shader.js"></script>
 		<script type="text/javascript" src="./Timer.js"></script>
 		<script src="./dat.gui.js"></script>
-        <script type="text/javascript" src="./main.js"></script>
+		<script src="./canvastotiff.min.js"></script>
+		<script type="text/javascript" src="./main.js"></script>
+		<!-- <button style="right: 45%; bottom:0px;" id = "save" class="ui">EXPORT TO TIFF</button> -->
+
     </body>
 </html>
