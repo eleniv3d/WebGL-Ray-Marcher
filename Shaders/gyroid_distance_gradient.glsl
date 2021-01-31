@@ -42,22 +42,9 @@ float GetDist(vec2 p) {
     return GetDist(vec3(p, staticZ));
 }
 
-vec3 GetNormal(vec3 p) {
-	float d = GetDist(p);
-    vec2 e = vec2(.01, 0);
-    
-    vec3 n = d - vec3(
-        GetDist(p-e.xyy),
-        GetDist(p-e.yxy),
-        GetDist(p-e.yyx)
-    );
-    
-    return -normalize(n);
-    // return abs(normalize(n) );
-}
-
 vec3 colorFromDistance(float d) {
-    vec3 color = mix(color1,color2,floor( (d * .5 + .5) * steps + .5) / steps );
+    float dRemap = float(int( ( d * .5 + .5) * steps + .5 ) ) / steps;
+    vec3 color = mix(color1,color2, dRemap );
 
     return color;
 }
@@ -66,7 +53,7 @@ void main()
 {
     float d = GetDist(vec3(gl_FragCoord.xy, zHeight) );
     
-    vec3 n = colorFromDistance(d);
+    vec3 n = colorFromDistance(d * 2.);
 
     gl_FragColor = vec4(n, 1.);
 }

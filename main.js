@@ -80,7 +80,7 @@ var initCanvas = function() {
     var folder3 = gui.addFolder('scales');
     folder3.add(scales, 'gyroidA', -3.00, 3.00);
     folder3.add(scales, 'gyroidB', -3.00, 3.00);
-    folder3.add(scales, 'zHeight', -10.00, 10.00);
+    folder3.add(scales, 'zHeight', -1000.00, 1000.00);
     folder3.add(scales, 'steps', 2, 10);
 
     var folder4 = gui.addFolder('shader');
