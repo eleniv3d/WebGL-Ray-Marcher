@@ -88,6 +88,26 @@ class Shader
     /**
      * Set a vec2 uniform in the shader program
      * @param {string} uniformName Name of the uniform in the shader program
+     * @param {flat array} vector 3D color vector to pass to the shader
+     */
+    SetUniformColor(uniformName, cV) 
+    {
+        gl.uniform3fv(gl.getUniformLocation(this.shaderProgram, uniformName), [cV.r, cV.g, cV.b]);
+    }
+
+    /**
+     * Set a vec2 uniform in the shader program
+     * @param {string} uniformName Name of the uniform in the shader program
+     * @param {flat array} vector 2D vector to pass to the shader
+     */
+    SetUniformVec3(uniformName, vector)
+    {
+        gl.uniform3fv(gl.getUniformLocation(this.shaderProgram, uniformName), vector);
+    }
+
+    /**
+     * Set a vec2 uniform in the shader program
+     * @param {string} uniformName Name of the uniform in the shader program
      * @param {flat array} vector 2D vector to pass to the shader
      */
     SetUniformVec2(uniformName, vector)

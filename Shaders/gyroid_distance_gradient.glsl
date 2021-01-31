@@ -5,9 +5,7 @@ precision mediump float;
 uniform float time;
 uniform vec2 resolution;
 uniform float fractalIncrementer;
-uniform float uperBoundsr;
-uniform float uperBoundsg;
-uniform float uperBoundsb;
+
 
 // Gyroid Marching
 const float tau = 6.2831853072;
@@ -27,8 +25,8 @@ float sGB = 1.;
 // float sGB = scaleGyroidB;
 
 // color scheme
-vec3 color1 = vec3(1.9,0.55,0);
-vec3 color2 = vec3(uperBoundsr, uperBoundsg, uperBoundsb);
+uniform vec3 color1;
+uniform vec3 color2;
 
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
@@ -80,7 +78,7 @@ void main()
 
     // vec3 col = vec3(GetNormal(fragCoord) );
     
-    float d = GetDist(gl_FragCoord.xy);
+    float d = GetDist(vec3(gl_FragCoord.xy, 0), sGA, sGB);
     vec3 n = colorFromDistance(d);
 
     gl_FragColor = vec4(n, 1.);

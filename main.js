@@ -1,9 +1,15 @@
 var mesh, timer, shaderProgram;
 
-var colors = new function() {
-	this.r = 0.5;
-	this.g = 0.5;
-	this.b = 0.5;
+var color1 = new function() {
+	this.r = 0.;
+	this.g = 0.;
+	this.b = 0.;
+}
+
+var color2 = new function() {
+	this.r = 1.;
+	this.g = 1.;
+	this.b = 1.;
 }
 
 var scales = new function() {
@@ -59,20 +65,24 @@ var initCanvas = function() {
 
     var gui = new dat.GUI();
 
-    var folder = gui.addFolder('colors');
-	folder.add(colors, 'r', 0.0, 1.0);
-    folder.add(colors, 'b', 0.0, 1.0);
-    folder.add(colors, 'g', 0, 1.0);
+    var folder = gui.addFolder('color1');
+	folder.add(color1, 'r', 0.0, 1.0);
+    folder.add(color1, 'b', 0.0, 1.0);
+    folder.add(color1, 'g', 0.0, 1.0);
 
-    var folder2 = gui.addFolder('scales');
-    folder2.add(scales, 'gyroidA', -3.00, 3.00);
-    folder2.add(scales, 'gyroidB', -3.00, 3.00);
+    var folder2 = gui.addFolder('color2');
+    folder2.add(color2, 'r', 0.0, 1.0);
+    folder2.add(color2, 'b', 0.0, 1.0);
+    folder2.add(color2, 'g', 0.0, 1.0);
 
-    var folder3 = gui.addFolder('shader');
-	folder3.add(shader, 'type', ["gyroid", "mandelbulb", "spheres"]).onChange( function () {
+    var folder3 = gui.addFolder('scales');
+    folder3.add(scales, 'gyroidA', -3.00, 3.00);
+    folder3.add(scales, 'gyroidB', -3.00, 3.00);
+
+    var folder4 = gui.addFolder('shader');
+	folder4.add(shader, 'type', ["gyroid", "mandelbulb", "spheres"]).onChange( function () {
 
 		switchShader(shader)
-		
 	} );
 }
 
@@ -97,9 +107,8 @@ var drawScene = function() {
     shaderProgram.SetUniform1f("time", timer.GetTicksInRadians());
     shaderProgram.SetUniform1f("fractalIncrementer", timer.GetFractalIncrement());
 
-    shaderProgram.SetUniform1f("uperBoundsr", colors.r);
-    shaderProgram.SetUniform1f("uperBoundsg", colors.g);
-    shaderProgram.SetUniform1f("uperBoundsb", colors.b);
+    shaderProgram.SetUniformColor("color1", color1);
+    shaderProgram.SetUniformColor("color2", color2);
 
     shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
     shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidB) );
