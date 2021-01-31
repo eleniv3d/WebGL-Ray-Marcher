@@ -80,7 +80,7 @@ var initCanvas = function() {
     folder3.add(scales, 'gyroidB', -3.00, 3.00);
 
     var folder4 = gui.addFolder('shader');
-	folder4.add(shader, 'type', ["gyroid", "mandelbulb", "spheres"]).onChange( function () {
+	folder4.add(shader, 'type', ["gyroid", "mandelbulb", "spheres", "clouded"]).onChange( function () {
 
 		switchShader(shader)
 	} );
@@ -135,6 +135,8 @@ function switchShader() {
         frag = 'fragShader'
     }else if(shader.type =="spheres"){
         frag = 'fragShader3'
+    }else if(shader.type =="clouded"){
+        frag = 'fragShader4'
     }
     shaderProgram = new Shader('vertShader', frag);
     // Activate the shader program
