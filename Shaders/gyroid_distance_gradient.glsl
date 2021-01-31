@@ -5,6 +5,7 @@ uniform float time;
 uniform vec2 resolution;
 uniform float fractalIncrementer;
 
+uniform float zHeight;
 
 // Gyroid Marching
 const float tau = 6.2831853072;
@@ -62,7 +63,7 @@ vec3 colorFromDistance(float d) {
 
 void main()
 {
-    float d = GetDist(vec3(gl_FragCoord.xy, 0));
+    float d = GetDist(vec3(gl_FragCoord.xy, zHeight));
     vec3 n = colorFromDistance(d);
 
     gl_FragColor = vec4(n, 1.);

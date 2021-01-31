@@ -15,6 +15,7 @@ var color2 = new function() {
 var scales = new function() {
     this.gyroidA = -1.00;
     this.gyroidB = 0.00;
+    this.zHeight = 0.;
 }
 
 var shader = new function() {
@@ -78,6 +79,7 @@ var initCanvas = function() {
     var folder3 = gui.addFolder('scales');
     folder3.add(scales, 'gyroidA', -3.00, 3.00);
     folder3.add(scales, 'gyroidB', -3.00, 3.00);
+    folder3.add(scales, 'zHeight', -3.00, 3.00);
 
     var folder4 = gui.addFolder('shader');
 	folder4.add(shader, 'type', ["gyroid", "mandelbulb", "spheres", "clouded"]).onChange( function () {
@@ -114,6 +116,8 @@ var drawScene = function() {
         Math.pow(10., scales.gyroidA),
         Math.pow(10., scales.gyroidB)
     ]);
+
+    shaderProgram.SetUniform1f("zHeight", scales.zHeight);
 
     // shaderProgram.SetUniform1f("gyroidA", Math.pow(10., scales.gyroidA) );
     // shaderProgram.SetUniform1f("gyroidB", Math.pow(10., scales.gyroidA) );
