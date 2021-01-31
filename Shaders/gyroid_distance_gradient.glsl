@@ -63,12 +63,7 @@ vec3 colorFromDistance(float d) {
 
 void main()
 {
-    // vec2 uv = (gl_FragCoord.xy - .5 * resolution.xy) / resolution.y;
-    // vec2 m = mouse.xy/ resolution.xy;
-
-    // vec3 col = vec3(GetNormal(fragCoord) );
-    
-    float d = GetDist(vec3(gl_FragCoord.xy, 0), gyroidScales.x, gyroidScales.y);
+    float d = GetDist(vec3(gl_FragCoord.xy, 0));
     vec3 n = colorFromDistance(d);
 
     gl_FragColor = vec4(n, 1.);
