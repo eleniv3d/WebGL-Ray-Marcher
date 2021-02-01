@@ -27,12 +27,16 @@ color10 = HSVtoRGB(params.color10);
 var scales = new function () {
     this.gyroidA = -1.80;
     this.gyroidB = -1.00;
+    this.gyroidC = -1.00;
+    this.periodA = -1.00;
+    this.periodB = -1.00;
+    this.periodC = -1.00;
     this.zHeight = 0.;
 }
 
 var abstractionLevel = new function () {
     this.steps = 8;
-    this.resolution = 1.;
+    this.resolution = 2.;
 }
 
 var transformation = new function() {
@@ -152,6 +156,10 @@ var initCanvas = function () {
     var folder3 = gui.addFolder('scales');
     folder3.add(scales, 'gyroidA', -3.00, 3.00);
     folder3.add(scales, 'gyroidB', -3.00, 3.00);
+    folder3.add(scales, 'gyroidC', -3.00, 3.00);
+    folder3.add(scales, 'periodA', -3.00, 3.00);
+    folder3.add(scales, 'periodB', -3.00, 3.00);
+    folder3.add(scales, 'periodC', -3.00, 3.00);
     folder3.add(scales, 'zHeight', -1000.00, 1000.00);
 
     var folder4 = gui.addFolder('moving');
@@ -166,7 +174,9 @@ var initCanvas = function () {
         "mandelbulb",
         "spheres",
         "clouded",
-        "indexedGyroid"
+        "indexedGyroid",
+        "schwarzDPPGradient",
+        "schwarzDPPIndexed"
     ]).onChange( function () {
 
 		switchShader(shader)
@@ -209,10 +219,18 @@ var drawScene = function () {
     shaderProgram.SetUniformColor("color9", color9);
     shaderProgram.SetUniformColor("color10", color10);
 
-    shaderProgram.SetUniformVec2("gyroidScales", [
+    shaderProgram.SetUniformVec3("fScales", [
         Math.pow(10., scales.gyroidA),
-        Math.pow(10., scales.gyroidB)
+        Math.pow(10., scales.gyroidB),
+        Math.pow(10., scales.gyroidC)
     ]);
+
+    shaderProgram.SetUniformVec3("pScales", [
+        Math.pow(10., scales.periodA),
+        Math.pow(10., scales.periodB),
+        Math.pow(10., scales.periodC)
+    ] );
+    
 
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
     shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1. );
@@ -243,6 +261,10 @@ function switchShader() {
         frag = 'fragShader4'
     } else if (shader.type == "indexedGyroid") {
         frag = 'fragShader5'
+    } else if (shader.type == "schwarzDPPIndexed") {
+        frag = 'schwarzDPPIndexed'
+    } else if (shader.type == "schwarzDPPGradient") {
+        frag = 'schwarzDPPGradient'
     }
     shaderProgram = new Shader('vertShader', frag);
     // Activate the shader program

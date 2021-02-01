@@ -15,7 +15,8 @@ uniform vec3 mvVec;
 uniform float alpha;
 
 // function parameters
-uniform vec2 gyroidScales;
+uniform vec3 fScales;
+uniform vec3 pScales;
 uniform float zHeight;
 uniform float steps;
 
@@ -34,7 +35,7 @@ float sdGyroid(vec3 p, float scale) {
 }
 
 float GetDist(vec3 p) {
-    float d_g = sdGyroid(p, gyroidScales.x * sdGyroid(p, gyroidScales.y) );
+    float d_g = sdGyroid(p, fScales.x * sdGyroid(p, fScales.y) );
 
     return d_g;
 }

@@ -23,19 +23,9 @@ uniform float steps;
 // color scheme
 uniform vec3 color1;
 uniform vec3 color2;
-uniform vec3 color3;
-uniform vec3 color4;
-uniform vec3 color5;
-uniform vec3 color6;
-uniform vec3 color7;
-uniform vec3 color8;
-uniform vec3 color9;
-uniform vec3 color10;
 
 // resolution
 uniform vec3 pixelResolution;
-
-// vec3 pixelSize = vec3(pixelResolution);
 
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
@@ -69,13 +59,13 @@ float sdSchwarD(vec3 p, float scale) {
     return d;
 }
 
-float GetDist(vec3 p) {
-    float d_g = sdGyroid(p, fScales.x * sdGyroid(p, fScales.y) );
+float GetDist(vec3 p, float scaleA, float scaleB, float scaleC) {
+    float d_g = sdSchwarP(p, scaleC * sdSchwarD(p, scaleB * sdSchwarD(p, scaleA) ) );
     return d_g;
 }
 
-float GetDist(vec3 p, float scaleA, float scaleB) {
-    float d_g = sdGyroid(p, scaleB * sdGyroid(p, scaleA) );
+float GetDist(vec3 p) {
+    float d_g = GetDist(p, fScales.x, fScales.y, fScales.z);
     return d_g;
 }
 
@@ -84,31 +74,9 @@ float GetDist(vec2 p) {
 }
 
 vec3 colorFromDistance(float d) {
-    int cIdx = int(float(floor( ( d * .5 + .5) * steps + .5 ) ) );
-    vec3 color;
-    if (cIdx == 0) {
-        color = color1;
-    } else if (cIdx == 1) {
-        color = color2;
-    } else if (cIdx == 2) {
-        color = color3;
-    } else if (cIdx == 3) {
-        color = color4;
-    } else if (cIdx == 4) {
-        color = color5;
-    } else if (cIdx == 5) {
-        color = color6;
-    } else if (cIdx == 6) {
-        color = color7;
-    } else if (cIdx == 7) {
-        color = color8;
-    } else if (cIdx == 8) {
-        color = color9;
-    } else if (cIdx == 9) {
-        color = color10;
-    } else {
-        color = vec3(1.0);
-    }
+    float dRemap = float(floor( ( d * .5 + .5) * steps + .5 ) ) / steps;
+    vec3 color = mix(color1,color2, dRemap );
+
     return color;
 }
 
