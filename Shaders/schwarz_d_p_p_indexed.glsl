@@ -34,6 +34,7 @@ uniform vec3 color10;
 
 // resolution
 uniform vec3 pixelResolution;
+uniform float globalScale;
 
 // vec3 pixelSize = vec3(pixelResolution);
 
@@ -140,7 +141,7 @@ void main()
     
     float d = GetDist(p);
     
-    vec3 n = colorFromDistance(d * 2.);
+    vec3 n = colorFromDistance(d);
 
     gl_FragColor = vec4(n, 1.);
 }

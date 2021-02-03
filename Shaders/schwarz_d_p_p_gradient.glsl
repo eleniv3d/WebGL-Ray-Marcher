@@ -26,6 +26,7 @@ uniform vec3 color2;
 
 // resolution
 uniform vec3 pixelResolution;
+uniform float globalScale;
 
 float sdGyroid(vec3 p, float scale) {
     p *= scale;

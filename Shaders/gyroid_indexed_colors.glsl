@@ -34,6 +34,7 @@ uniform vec3 color10;
 
 // resolution
 uniform vec3 pixelResolution;
+uniform float globalScale;
 
 // vec3 pixelSize = vec3(pixelResolution);
 

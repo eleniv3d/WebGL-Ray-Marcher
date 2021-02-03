@@ -26,6 +26,7 @@ uniform vec3 color2;
 
 // resolution
 uniform vec3 pixelResolution;
+uniform float globalScale;
 
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
@@ -78,10 +79,10 @@ vec3 rotate(vec3 p) {
 void main()
 {
     vec3 p = vec3(gl_FragCoord.xy, zHeight);
-    p = p - mod(p, pixelResolution);
+    p = p - mod(p, pixelResolution / globalScale);
     p = translate( rotate( p ) );
     
-    float d = GetDist(p);
+    float d = GetDist(p * globalScale);
     
     vec3 n = colorFromDistance(d * 2.);
 

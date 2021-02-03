@@ -32,6 +32,7 @@ var scales = new function () {
     this.periodB = -1.00;
     this.periodC = -1.00;
     this.zHeight = 0.;
+    this.globalScale = 0.;
 }
 
 var abstractionLevel = new function () {
@@ -154,13 +155,14 @@ var initCanvas = function () {
     });
 
     var folder3 = gui.addFolder('scales');
-    folder3.add(scales, 'gyroidA', -3.00, 3.00);
-    folder3.add(scales, 'gyroidB', -3.00, 3.00);
-    folder3.add(scales, 'gyroidC', -3.00, 3.00);
-    folder3.add(scales, 'periodA', -3.00, 3.00);
-    folder3.add(scales, 'periodB', -3.00, 3.00);
-    folder3.add(scales, 'periodC', -3.00, 3.00);
+    folder3.add(scales, 'gyroidA', -3.00, 5.00);
+    folder3.add(scales, 'gyroidB', -3.00, 5.00);
+    folder3.add(scales, 'gyroidC', -3.00, 5.00);
+    folder3.add(scales, 'periodA', -3.00, 5.00);
+    folder3.add(scales, 'periodB', -3.00, 5.00);
+    folder3.add(scales, 'periodC', -3.00, 5.00);
     folder3.add(scales, 'zHeight', -1000.00, 1000.00);
+    folder3.add(scales, 'globalScale', -4.00, 4.00);
 
     var folder4 = gui.addFolder('moving');
     folder4.add(transformation, 'x', 0., 5.);
@@ -230,6 +232,8 @@ var drawScene = function () {
         Math.pow(10., scales.periodB),
         Math.pow(10., scales.periodC)
     ] );
+
+    shaderProgram.SetUniform1f("globalScale", Math.pow(10., scales.globalScale) );
     
 
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
@@ -260,7 +264,7 @@ function switchShader() {
     } else if (shader.type == "clouded") {
         frag = 'fragShader4'
     } else if (shader.type == "indexedGyroid") {
-        frag = 'fragShader5'
+        frag = 'gyroidIndexed'
     } else if (shader.type == "schwarzDPPIndexed") {
         frag = 'schwarzDPPIndexed'
     } else if (shader.type == "schwarzDPPGradient") {
