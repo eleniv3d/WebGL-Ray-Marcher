@@ -32,7 +32,7 @@ var scales = new function () {
     this.periodB = -1.00;
     this.periodC = -1.00;
     this.zHeight = 0.;
-    this.globalScale = 0.;
+    this.globalScale = 1;
 }
 
 var abstractionLevel = new function () {
@@ -88,15 +88,11 @@ var start = function () {
     drawScene();
 };
 
-function zoom(event) {
-    event.preventDefault();
-    //console.log("triggered");
-    scales.globalScale += event.deltaY;
-
-    // Restrict scale
-    scales.globalScale = Math.min(Math.max(.125, scales.globalScale), 4);
-
-    // Apply scale transform
+function zoomin() {
+    scales.globalScale *= 1.1;
+}
+function zoomout() {
+    scales.globalScale *= 0.9;
 }
 
 // starts the canvas and gl
@@ -108,7 +104,16 @@ var initCanvas = function () {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    canvas.addEventListener('wheel', zoom);
+    canvas.addEventListener('wheel', function(event)
+    {   console.log(event.deltaY);
+        if (event.deltaY < 0){ 
+        zoomin();
+     }
+     else if (event.deltaY > 0)
+     {
+        zoomout();
+     }
+    });
 
     // btn = document.getElementById("save");
     // btn.addEventListener('click', saveTIFF);
@@ -246,7 +251,7 @@ var drawScene = function () {
         Math.pow(10., scales.periodC)
     ] );
 
-    shaderProgram.SetUniform1f("globalScale", Math.pow(10., scales.globalScale) );
+    shaderProgram.SetUniform1f("globalScale",  scales.globalScale);
     
 
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);

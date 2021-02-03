@@ -1,7 +1,7 @@
 class Mesh
 {
     constructor(verticesArray, indicesArray, shader)
-    {
+    {   
         this.numberOfIndices = indicesArray.length;
         // Create vao, vbo, and ebo
         this.vao = gl.createVertexArray();
