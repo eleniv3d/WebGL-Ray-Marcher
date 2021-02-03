@@ -60,7 +60,7 @@ float sdSchwarD(vec3 p, float scale) {
 }
 
 float GetDist(vec3 p, float scaleA, float scaleB, float scaleC) {
-    float d_g = sdSchwarP(p, scaleC * sdSchwarD(p, scaleB * sdSchwarD(p, scaleA) ) );
+    float d_g = sdSchwarD(p, scaleGyroidB * (1. + sdSchwarD(p, scaleGyroidA) ) );
     return d_g;
 }
 
