@@ -88,6 +88,17 @@ var start = function () {
     drawScene();
 };
 
+function zoom(event) {
+    event.preventDefault();
+
+    scales.globalScale += event.deltaY;
+
+    // Restrict scale
+    scales.globalScale = Math.min(Math.max(.125, scales.globalScale), 4);
+
+    // Apply scale transform
+}
+
 // starts the canvas and gl
 var initCanvas = function () {
     canvas = document.getElementById('game-surface');
@@ -96,6 +107,8 @@ var initCanvas = function () {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    gl.onwheel = zoom;
 
     // btn = document.getElementById("save");
     // btn.addEventListener('click', saveTIFF);
