@@ -90,7 +90,7 @@ var start = function () {
 
 function zoom(event) {
     event.preventDefault();
-
+    //console.log("triggered");
     scales.globalScale += event.deltaY;
 
     // Restrict scale
@@ -108,7 +108,7 @@ var initCanvas = function () {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    gl.onwheel = zoom;
+    canvas.addEventListener('wheel', zoom);
 
     // btn = document.getElementById("save");
     // btn.addEventListener('click', saveTIFF);
