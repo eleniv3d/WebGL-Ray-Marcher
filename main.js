@@ -1,16 +1,16 @@
 var mesh, timer, shaderProgram;
 
-var params = new function() {
-    this.color1 = { h:10, s:1., v:0.8 };
-    this.color2 = { h:100, s:0.7, v:0.7 };
-    this.color3 = { h:50, s:1., v:0.8 };
-    this.color4 = { h:200, s:0.7, v:0.7 };
-    this.color5 = { h:80, s:1., v:0.8 };
-    this.color6 = { h:300, s:0.7, v:0.7 };
-    this.color7 = { h:140, s:1., v:0.8 };
-    this.color8 = { h:60, s:0.7, v:0.7 };
-    this.color9 = { h:240, s:1., v:0.8 };
-    this.color10 = { h:160, s:0.7, v:0.7 };
+var params = new function () {
+    this.color1 = { h: 10, s: 1., v: 0.8 };
+    this.color2 = { h: 100, s: 0.7, v: 0.7 };
+    this.color3 = { h: 50, s: 1., v: 0.8 };
+    this.color4 = { h: 200, s: 0.7, v: 0.7 };
+    this.color5 = { h: 80, s: 1., v: 0.8 };
+    this.color6 = { h: 300, s: 0.7, v: 0.7 };
+    this.color7 = { h: 140, s: 1., v: 0.8 };
+    this.color8 = { h: 60, s: 0.7, v: 0.7 };
+    this.color9 = { h: 240, s: 1., v: 0.8 };
+    this.color10 = { h: 160, s: 0.7, v: 0.7 };
 };
 
 color1 = HSVtoRGB(params.color1);
@@ -40,7 +40,7 @@ var abstractionLevel = new function () {
     this.resolution = 2.;
 }
 
-var transformation = new function() {
+var transformation = new function () {
     this.x = 0.0;
     this.y = 0.0;
     this.z = 0.0;
@@ -51,8 +51,8 @@ function powF(value) {
     return Math.pow(10., value) - 1.0;
 }
 
-var shader = new function() {
-	this.type = "gyroid";
+var shader = new function () {
+    this.type = "gyroid";
 }
 
 // start() is the main function that gets called first by index.html
@@ -60,6 +60,27 @@ var start = function () {
 
     // Initialize the WebGL 2.0 canvas
     initCanvas();
+
+    //tiff export
+    const saveBlob = (function () {
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.style.display = 'none';
+        return function saveData(blob, fileName) {
+            const url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        };
+    }());
+
+    var btn = document.getElementById("save");
+    btn.addEventListener('click', () => {
+        drawScene();
+        canvas.toBlob((blob) => {
+            saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.tiff`);
+        });
+    });
 
     // Create timer that will be used for fragment shader
     timer = new Timer();
@@ -98,25 +119,22 @@ function zoomout() {
 // starts the canvas and gl
 var initCanvas = function () {
     canvas = document.getElementById('game-surface');
-    gl = canvas.getContext('webgl2');   // WebGL 2
+    gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true });   // WebGL 2
 
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.pres
 
-    canvas.addEventListener('wheel', function(event)
-    {   console.log(event.deltaY);
-        if (event.deltaY < 0){ 
-        zoomin();
-     }
-     else if (event.deltaY > 0)
-     {
-        zoomout();
-     }
+    canvas.addEventListener('wheel', function (event) {
+        console.log(event.deltaY);
+        if (event.deltaY < 0) {
+            zoomin();
+        }
+        else if (event.deltaY > 0) {
+            zoomout();
+        }
     });
-
-    // btn = document.getElementById("save");
-    // btn.addEventListener('click', saveTIFF);
 
     var gui = new dat.GUI();
 
@@ -132,43 +150,43 @@ var initCanvas = function () {
     hsv9 = folder.addColor(params, 'color9');
     hsv10 = folder.addColor(params, 'color10');
 
-    hsv1.onChange(function(value) {        
+    hsv1.onChange(function (value) {
         color1 = HSVtoRGB(value);
     });
 
-    hsv2.onChange(function(value) {   
+    hsv2.onChange(function (value) {
         color2 = HSVtoRGB(value);
     });
 
-    hsv3.onChange(function(value) {        
+    hsv3.onChange(function (value) {
         color3 = HSVtoRGB(value);
     });
 
-    hsv4.onChange(function(value) {        
+    hsv4.onChange(function (value) {
         color4 = HSVtoRGB(value);
     });
 
-    hsv5.onChange(function(value) {        
+    hsv5.onChange(function (value) {
         color5 = HSVtoRGB(value);
     });
 
-    hsv6.onChange(function(value) {        
+    hsv6.onChange(function (value) {
         color6 = HSVtoRGB(value);
     });
 
-    hsv7.onChange(function(value) {        
+    hsv7.onChange(function (value) {
         color7 = HSVtoRGB(value);
     });
 
-    hsv8.onChange(function(value) {        
+    hsv8.onChange(function (value) {
         color8 = HSVtoRGB(value);
     });
 
-    hsv9.onChange(function(value) {        
+    hsv9.onChange(function (value) {
         color9 = HSVtoRGB(value);
     });
 
-    hsv10.onChange(function(value) {        
+    hsv10.onChange(function (value) {
         color10 = HSVtoRGB(value);
     });
 
@@ -189,7 +207,7 @@ var initCanvas = function () {
     folder4.add(transformation, 'rz', -3.1415927, 3.1415927);
 
     var folder5 = gui.addFolder('shader');
-	folder5.add(shader, 'type', [
+    folder5.add(shader, 'type', [
         "gyroid",
         "mandelbulb",
         "spheres",
@@ -197,11 +215,11 @@ var initCanvas = function () {
         "indexedGyroid",
         "schwarzDPPGradient",
         "schwarzDPPIndexed"
-    ]).onChange( function () {
+    ]).onChange(function () {
 
-		switchShader(shader)
-    } );
-    
+        switchShader(shader)
+    });
+
     var folder6 = gui.addFolder('abstraction level');
     folder6.add(abstractionLevel, 'resolution', 1, 10);
     folder6.add(abstractionLevel, 'steps', 2, 10);
@@ -249,21 +267,21 @@ var drawScene = function () {
         Math.pow(10., scales.periodA),
         Math.pow(10., scales.periodB),
         Math.pow(10., scales.periodC)
-    ] );
+    ]);
 
-    shaderProgram.SetUniform1f("globalScale",  scales.globalScale);
-    
+    shaderProgram.SetUniform1f("globalScale", scales.globalScale);
+
 
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
-    shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1. );
+    shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1.);
     shaderProgram.SetUniformVec3("pixelResolution", [
-        Math.floor(abstractionLevel.resolution), 
-        Math.floor(abstractionLevel.resolution), 
+        Math.floor(abstractionLevel.resolution),
+        Math.floor(abstractionLevel.resolution),
         Math.floor(abstractionLevel.resolution)
-    ] );
-    
+    ]);
+
     shaderProgram.SetUniform1f("alpha", transformation.rz);
-    shaderProgram.SetUniformVec3("mvVec", [Math.pow(10., transformation.x), Math.pow(10., transformation.y), Math.pow(10., transformation.z) ]);
+    shaderProgram.SetUniformVec3("mvVec", [Math.pow(10., transformation.x), Math.pow(10., transformation.y), Math.pow(10., transformation.z)]);
 
     // Tell WebGL to draw the scene
     mesh.Draw();
@@ -294,31 +312,13 @@ function switchShader() {
 
 }
 
-// function saveTIFF() {
-//     var canvas = document.getElementById('game-surface');
-
-//     canvas.toBlob(function (blob) {
-//         var newImg = document.createElement("img"),
-//             url = URL.createObjectURL(blob);
-
-//         newImg.onload = function () {
-//             // no longer need to read the blob so it's revoked
-//             URL.revokeObjectURL(url);
-//         };
-
-//         newImg.src = url;
-//         document.body.appendChild(newImg);
-//         //window.location.href = "img";
-//     });
-// }
-
 function HSVtoRGB(h, s, v) {
     var r, g, b, i, f, p, q, t;
     if (arguments.length === 1) {
         s = h.s, v = h.v, h = h.h;
     }
     // adjust to match p5 format
-    h = h/360.;
+    h = h / 360.;
     i = Math.floor(h * 6.);
     f = h * 6. - i;
     p = v * (1. - s);
