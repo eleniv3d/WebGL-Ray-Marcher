@@ -217,7 +217,9 @@ var initCanvas = function () {
         "schwarzDPPIndexed",
         "gyroidSmooth",
         "schwarzDPPSmooth"
-    ]).onChange( function () );
+    ]).onChange( function () {
+        switchShader(shader);
+    });
 
     var folder6 = gui.addFolder('abstraction level');
     folder6.add(abstractionLevel, 'resolution', 1, 10);
