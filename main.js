@@ -196,7 +196,9 @@ var initCanvas = function () {
         "clouded",
         "indexedGyroid",
         "schwarzDPPGradient",
-        "schwarzDPPIndexed"
+        "schwarzDPPIndexed",
+        "gyroidSmooth",
+        "schwarzDPPSmooth"
     ]).onChange( function () {
 
 		switchShader(shader)
@@ -287,6 +289,10 @@ function switchShader() {
         frag = 'schwarzDPPIndexed'
     } else if (shader.type == "schwarzDPPGradient") {
         frag = 'schwarzDPPGradient'
+    } else if (shader.type == "schwarzDPPSmooth") {
+        frag = 'schwarzDPPSmooth'
+    } else if (shader.type == "gyroidSmooth") {
+        frag = 'gyroidSmooth'
     }
     shaderProgram = new Shader('vertShader', frag);
     // Activate the shader program
