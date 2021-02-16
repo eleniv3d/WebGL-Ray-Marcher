@@ -7,6 +7,7 @@
 // webgl parameters
 precision mediump float;
 
+uniform vec2 mousePosition;
 uniform float time;
 uniform vec2 resolution;
 uniform float fractalIncrementer;
@@ -222,7 +223,7 @@ vec3 R(vec2 uv, vec3 p, vec3 l, float z) {
 void main()
 {
     vec2 uv = (gl_FragCoord.xy - .5 * resolution.xy) / resolution.y;
-    vec2 m = 4.*pScales.xy/ resolution.xy;
+    vec2 m = 4.*mousePosition.xy/ resolution.xy;
 
     vec3 ro = vec3(10., -5., 0.);
     ro.yx *= Rot(-m.y*2.);
