@@ -55,6 +55,11 @@ var shader = new function () {
     this.type = "gyroid";
 }
 
+var pos = new function () {
+    this.x = 0;
+    this.y = 0;
+}
+
 // start() is the main function that gets called first by index.html
 var start = function () {
 
@@ -133,6 +138,16 @@ var initCanvas = function () {
         }
         else if (event.deltaY > 0) {
             zoomout();
+        }
+    });
+
+    canvas.addEventListener('mousedown', function (event) {
+        
+        if (event.button==0){
+            //console.log("right")
+            console.log(event.x - 0.5*canvas.width, 0.5*canvas.height-event.y);
+            pos.x = event.x - 0.5*canvas.width
+            pos.y = 0.5*canvas.height-event.y
         }
     });
 
