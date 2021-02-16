@@ -5,7 +5,6 @@ uniform float time;
 uniform vec2 resolution;
 uniform float fractalIncrementer;
 
-
 // Gyroid Marching
 const float tau = 6.2831853072;
 const float staticZ = 0.;

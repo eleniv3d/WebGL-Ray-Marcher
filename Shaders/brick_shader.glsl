@@ -1,7 +1,8 @@
-#define MAX_STEPS 1000
+#define MAX_STEPS 100
 #define MAX_DIST 200.
-#define SURF_DIST .001
+#define SURF_DIST .01
 #define TAU 6.283185
+#define UNDERSTEP 10.
 
 // webgl parameters
 precision mediump float;
@@ -14,6 +15,10 @@ uniform float fractalIncrementer;
 uniform vec3 fScales;
 uniform float globalScale;
 uniform vec3 pScales;
+
+// colors
+uniform vec3 color1;
+uniform vec3 color2;
 
 const float bandHeight = .02;
 const float doubleBH = bandHeight * 2.;
@@ -160,7 +165,7 @@ float RayMarch(vec3 ro, vec3 rd) {
 
     for (int i = 0; i < MAX_STEPS; i++) {
         vec3 p = ro + rd * d0;
-        float dS = GetDist(p);
+        float dS = GetDist(p) * UNDERSTEP;
         d0 += dS;
 
         if (d0 > MAX_DIST || dS < SURF_DIST) break;
