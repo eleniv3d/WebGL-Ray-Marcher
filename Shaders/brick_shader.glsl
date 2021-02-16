@@ -1,8 +1,8 @@
-#define MAX_STEPS 100
+#define MAX_STEPS 2000
 #define MAX_DIST 200.
 #define SURF_DIST .01
 #define TAU 6.283185
-#define UNDERSTEP 10.
+#define UNDERSTEP 1.
 
 // webgl parameters
 precision mediump float;
