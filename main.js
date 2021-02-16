@@ -140,12 +140,22 @@ var initCanvas = function () {
             zoomout();
         }
     });
+
+    thisVariable=false;
     canvas.addEventListener('mousedown', function () {
-        canvas.addEventListener('mousemove', function (event) {
+        thisVariable=true;
+    });
+
+    canvas.addEventListener('mousemove', function (event) {
+        if(thisVariable){
             console.log(event.x - 0.5*canvas.width, 0.5*canvas.height-event.y);
-            pos.x = event.x - 0.5*canvas.width
-            pos.y = 0.5*canvas.height-event.y
-        });
+            pos.x = event.x - 0.5*canvas.width;
+            pos.y = 0.5*canvas.height-event.y;
+        };
+    });
+
+    canvas.addEventListener('mouseup', function () {
+        thisVariable=false;
     });
 
     var gui = new dat.GUI();
