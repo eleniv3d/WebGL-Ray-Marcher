@@ -216,7 +216,8 @@ var initCanvas = function () {
         "schwarzDPPGradient",
         "schwarzDPPIndexed",
         "gyroidSmooth",
-        "schwarzDPPSmooth"
+        "schwarzDPPSmooth",
+        "brickShader"
     ]).onChange( function () {
         switchShader(shader);
     });
@@ -310,6 +311,8 @@ function switchShader() {
         frag = 'schwarzDPPSmooth'
     } else if (shader.type == "gyroidSmooth") {
         frag = 'gyroidSmooth'
+    } else if (shader.type == "brickShader") {
+        frag = 'brickShader'
     }
     shaderProgram = new Shader('vertShader', frag);
     // Activate the shader program
