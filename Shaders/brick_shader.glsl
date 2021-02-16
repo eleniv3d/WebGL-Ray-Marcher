@@ -69,6 +69,22 @@ float differenceSDF(float distA, float distB) {
     return max(distA, -distB);
 }
 
+float sdLine(vec2 p, vec2 a, vec2 b) {
+    float d=distance(a, b);
+    float l2 = d*d;
+    if(l2 == 0.0) return d;
+    
+    vec2 b_a = b-a;
+    float t = clamp(dot(p - a, b_a) / l2, 0., 1.);
+    vec2 j = a + t * (b_a);
+    
+    return distance(p, j);
+}
+
+float sdLine(vec3 p, vec2 a, vec2 b) {
+    return sdLine(p.xz, a, b);
+}
+
 float sdPlane(vec3 p, vec4 pln){
     return dot(p,pln.xyz) - pln.w;
 }
@@ -125,18 +141,7 @@ float sdCappedCone(vec3 p, vec3 a, vec3 b, float ra, float rb)
 }
 
 float sdCookie(vec3 p) {
-    float d_m=abs(sdPlane(p, planeMain))-brickW;
-    // float d_m=sdPlane(p, planeMain);
-    float d_sa=sdPlane(p, planeSecA);
-    float d_sb=sdPlane(p, planeSecB);
-
-    // float d=d_m;
-    float d=intersectSDF(intersectSDF(d_m, d_sa), d_sb);
-
-    float d_ca=sdCylinder(p, cylinderA, brickW);
-    float d_cb=sdCylinder(p, cylinderB, brickW);
-
-    d=unionSDF(unionSDF(d, d_ca), d_cb);
+    float d=sdLine(p, cylinderA, cylinderB)-brickW;
 
     float d_g=.3*sdGyroid(p, fScales.x*sdGyroid(p, fScales.y));
     d+=d_g;
@@ -223,7 +228,7 @@ vec3 R(vec2 uv, vec3 p, vec3 l, float z) {
 void main()
 {
     vec2 uv = (gl_FragCoord.xy - .5 * resolution.xy) / resolution.y;
-    vec2 m = 4.*mousePosition.xy/ resolution.xy;
+    vec2 m = 4.*mousePosition / resolution.xy;
 
     vec3 ro = vec3(10., -5., 0.);
     ro.yx *= Rot(-m.y*2.);

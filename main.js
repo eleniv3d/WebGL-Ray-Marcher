@@ -140,15 +140,12 @@ var initCanvas = function () {
             zoomout();
         }
     });
-
-    canvas.addEventListener('mousedown', function (event) {
-        
-        if (event.button==0){
-            //console.log("right")
+    canvas.addEventListener('mousedown', function () {
+        canvas.addEventListener('mousemove', function (event) {
             console.log(event.x - 0.5*canvas.width, 0.5*canvas.height-event.y);
             pos.x = event.x - 0.5*canvas.width
             pos.y = 0.5*canvas.height-event.y
-        }
+        });
     });
 
     var gui = new dat.GUI();
