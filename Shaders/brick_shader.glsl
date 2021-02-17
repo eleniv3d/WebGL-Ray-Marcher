@@ -228,11 +228,11 @@ vec3 R(vec2 uv, vec3 p, vec3 l, float z) {
 void main()
 {
     vec2 uv = (gl_FragCoord.xy - .5 * resolution.xy) / resolution.y;
-    vec2 m = 4.*mousePosition / resolution.xy;
+    vec2 m = mousePosition / resolution.xy;
 
-    vec3 ro = vec3(10., -5., 0.);
-    ro.yx *= Rot(-m.y*2.);
-    ro.xz *= Rot(-m.x*2.);
+    vec3 ro = vec3(5., 1., 0.);
+    ro.yx *= Rot(-m.y);
+    ro.xz *= Rot(-m.x);
     // ro.xz *= Rot(5.3 + m.x * TAU);
 
     vec3 rd = R(uv, ro, vec3(0), .58);

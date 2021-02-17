@@ -1,5 +1,7 @@
 var mesh, timer, shaderProgram;
 
+posScale = 1.;
+
 var params = new function () {
     this.color1 = { h: 10, s: 1., v: 0.8 };
     this.color2 = { h: 100, s: 0.7, v: 0.7 };
@@ -55,7 +57,17 @@ var shader = new function () {
     this.type = "gyroid";
 }
 
-var pos = new function () {
+var posActive = new function () {
+    this.x = 0;
+    this.y = 0;
+}
+
+var posStart = new function () {
+    this.x = 0;
+    this.y = 0;
+}
+
+var posBase = new function() {
     this.x = 0;
     this.y = 0;
 }
@@ -142,19 +154,29 @@ var initCanvas = function () {
     });
 
     thisVariable=false;
-    canvas.addEventListener('mousedown', function () {
+    canvas.addEventListener('mousedown', function (event) {
         thisVariable=true;
+        posStart.x = event.x;
+        posStart.y = event.y;
     });
 
     canvas.addEventListener('mousemove', function (event) {
         if(thisVariable){
-            console.log(event.x - 0.5*canvas.width, 0.5*canvas.height-event.y);
-            pos.x = event.x - 0.5*canvas.width;
-            pos.y = 0.5*canvas.height-event.y;
+            posActive.x = (event.x - posStart.x) * posScale;
+            posActive.y = (event.y - posStart.y) * posScale;
+            console.log(posActive.x, posActive.y);
         };
     });
 
     canvas.addEventListener('mouseup', function () {
+        posBase.x += posActive.x;
+        posBase.y += posActive.y;
+        // posBase.x %= Math.PI * 2.;
+        // posBase.y %= Math.PI * 2.;
+
+        posActive.x=0;
+        posActive.y=0;
+
         thisVariable=false;
     });
 
@@ -269,7 +291,10 @@ var drawScene = function () {
     shaderProgram.SetUniformVec2("resolution", [gl.canvas.width, gl.canvas.height]);
     shaderProgram.SetUniform1f("time", timer.GetTicksInRadians());
     shaderProgram.SetUniform1f("fractalIncrementer", timer.GetFractalIncrement());
-    shaderProgram.SetUniformVec2("mousePosition", [pos.x, pos.y]);
+    shaderProgram.SetUniformVec2("mousePosition", [
+        posBase.x+posActive.x,
+        posBase.y+posActive.y
+    ]);
 
     shaderProgram.SetUniformColor("color1", color1);
     shaderProgram.SetUniformColor("color2", color2);
