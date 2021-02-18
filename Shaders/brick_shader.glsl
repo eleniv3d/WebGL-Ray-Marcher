@@ -1,6 +1,6 @@
-#define MAX_STEPS 2000
+#define MAX_STEPS 500
 #define MAX_DIST 200.
-#define SURF_DIST .0001
+#define SURF_DIST .001
 #define TAU 6.283185
 #define UNDERSTEP .25
 
@@ -23,6 +23,7 @@ uniform vec3 color2;
 const float inverseMaxSteps = 1. / float(MAX_STEPS);
 const float clampScale = 1.;
 const float inverseClampScale = 1. / clampScale;
+const vec3 lightPos = vec3(15.);
 
 const float bandHeight = .02;
 const float doubleBH = bandHeight * 2.;
@@ -169,55 +170,69 @@ float GetDist(vec3 p) {
     return d*globalScale;
 }
 
-float RayMarch(vec3 ro, vec3 rd, out int steps) {
+float RayMarch(vec3 ro, vec3 rd) {
     float d0 = 0.;
 
     for (int i = 0; i < MAX_STEPS; i++) {
         vec3 p = ro + rd * d0;
         float dS = GetDist(p) * UNDERSTEP;
         d0 += dS;
-        steps+=1;
 
         if (d0 > MAX_DIST || dS < SURF_DIST) break;
     }
 
     return d0;
 }
-vec3 GetNormal(vec3 p) {
-	float d = GetDist(p);
-    vec2 e = vec2(.01, 0);
+// vec3 GetNormal(vec3 p) {
+// 	float d = GetDist(p);
+//     vec2 e = vec2(.01, 0);
     
-    vec3 n = d - vec3(
-        GetDist(p-e.xyy),
-        GetDist(p-e.yxy),
-        GetDist(p-e.yyx)
-    );
+//     vec3 n = d - vec3(
+//         GetDist(p-e.xyy),
+//         GetDist(p-e.yxy),
+//         GetDist(p-e.yyx)
+//     );
     
-    return -normalize(n);
-    // return abs(normalize(n) );
-}
-
-vec3 R(vec2 uv, vec3 p, vec3 l, float z, vec3 up) {
-    vec3 f = normalize(l-p),
-        r = normalize(cross(up, f)),
-        u = cross(f,r),
-        c = p+f*z,
-        i = c + uv.x*r + uv.y*u,
-        d = normalize(i-p);
-    return d;
-}
-
-// float GetLight(vec3 p) {
-//     vec3 lightPos = vec3(0,0,0);
-//     vec3 l = normalize(lightPos - p);
-//     vec3 n = GetNormal(p);
-
-//     float dif = clamp( dot(n, l) * .5 + .5, .0, 1.);
-//     float d = RayMarch(p + n * SURF_DIST * 2., l);
-//     if (p.y < .01 && d < length(lightPos - p)) dif *= .5;
-
-//     return dif;
+//     return -normalize(n);
+//     // return abs(normalize(n) );
 // }
+
+vec3 GetNormal(vec3 p)
+{
+    float d=GetDist(p);// Distance
+    vec2 e=vec2(.01,0);// Epsilon
+     
+    vec3 n=d-vec3(
+        GetDist(p-e.xyy),// e.xyy is the same as vec3(.01,0,0). The x of e is .01. this is called a swizzle
+        GetDist(p-e.yxy),
+        GetDist(p-e.yyx));
+         
+    return normalize(n);
+}
+
+// float GetLight(vec3 p, vec3 n);
+
+float GetLight(vec3 p)
+{
+    // Diffuse Color
+    // vec3 color = c.rgb * colorIntensity;
+ 
+    // Directional light
+    // vec3 lightPos=vec3(5.*sin(u_time),5.,6.+5.*cos(u_time));// Light Position
+ 
+    vec3 l=normalize(lightPos-p);// Light Vector
+    vec3 n=GetNormal(p);// Normal Vector
+     
+    float dif=dot(n,l);// Diffuse light
+    dif=clamp(dif,0.,1.);// Clamp so it doesnt go below 0
+     
+    // Shadows
+    float d=RayMarch(p+n*SURF_DIST*2.,l);
+     
+    if(d<length(lightPos-p))dif*=.1;
+     
+    return dif;
+}
 
 vec3 R(vec2 uv, vec3 p, vec3 l, float z) {
     vec3 f = normalize(l - p),
@@ -240,15 +255,12 @@ void main()
     // ro.xz *= Rot(5.3 + m.x * TAU);
 
     vec3 rd = R(uv, ro, vec3(0), .58);
+    float d = RayMarch(ro, rd);
 
-    int steps=0;
-    float d = RayMarch(ro, rd, steps);
-    // highp float stepScale = float(steps) * inverseMaxSteps;
     vec3 n;
     if (d < backgroundD) {
-        // n = inverseClampScale * clamp(d, 0., clampScale) * color2;
-        vec3 p = ro + d*rd;
-        n = vec3(.5) - GetNormal(p) * .5;
+        float l = GetLight(ro+d*rd);
+        n = color2 * clamp(l, .5, 1.);
     } else {
         n = color1;
     }
