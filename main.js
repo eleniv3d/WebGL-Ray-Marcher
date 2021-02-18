@@ -3,8 +3,8 @@ var mesh, timer, shaderProgram;
 posScale = 1.;
 
 var params = new function () {
-    this.color1 = { h: 10, s: 1., v: 0.8 };
-    this.color2 = { h: 100, s: 0.7, v: 0.7 };
+    this.color1 = { h: 244, s: .93, v: 0.56 };
+    this.color2 = { h: 350, s: .85, v: .77 };
     this.color3 = { h: 50, s: 1., v: 0.8 };
     this.color4 = { h: 200, s: 0.7, v: 0.7 };
     this.color5 = { h: 80, s: 1., v: 0.8 };
