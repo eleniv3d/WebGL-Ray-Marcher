@@ -5,26 +5,10 @@ posScale = 1.;
 var params = new function () {
     this.color1 = { h: 244, s: .93, v: 0.56 };
     this.color2 = { h: 350, s: .85, v: .77 };
-    this.color3 = { h: 50, s: 1., v: 0.8 };
-    this.color4 = { h: 200, s: 0.7, v: 0.7 };
-    this.color5 = { h: 80, s: 1., v: 0.8 };
-    this.color6 = { h: 300, s: 0.7, v: 0.7 };
-    this.color7 = { h: 140, s: 1., v: 0.8 };
-    this.color8 = { h: 60, s: 0.7, v: 0.7 };
-    this.color9 = { h: 240, s: 1., v: 0.8 };
-    this.color10 = { h: 160, s: 0.7, v: 0.7 };
 };
 
 color1 = HSVtoRGB(params.color1);
 color2 = HSVtoRGB(params.color2);
-color3 = HSVtoRGB(params.color3);
-color4 = HSVtoRGB(params.color4);
-color5 = HSVtoRGB(params.color5);
-color6 = HSVtoRGB(params.color6);
-color7 = HSVtoRGB(params.color7);
-color8 = HSVtoRGB(params.color8);
-color9 = HSVtoRGB(params.color9);
-color10 = HSVtoRGB(params.color10);
 
 var scales = new function () {
     this.gyroidA = -1.80;
@@ -185,14 +169,6 @@ var initCanvas = function () {
     var folder = gui.addFolder('colors');
     hsv1 = folder.addColor(params, 'color1');
     hsv2 = folder.addColor(params, 'color2');
-    hsv3 = folder.addColor(params, 'color3');
-    hsv4 = folder.addColor(params, 'color4');
-    hsv5 = folder.addColor(params, 'color5');
-    hsv6 = folder.addColor(params, 'color6');
-    hsv7 = folder.addColor(params, 'color7');
-    hsv8 = folder.addColor(params, 'color8');
-    hsv9 = folder.addColor(params, 'color9');
-    hsv10 = folder.addColor(params, 'color10');
 
     hsv1.onChange(function (value) {
         color1 = HSVtoRGB(value);
@@ -200,38 +176,6 @@ var initCanvas = function () {
 
     hsv2.onChange(function (value) {
         color2 = HSVtoRGB(value);
-    });
-
-    hsv3.onChange(function (value) {
-        color3 = HSVtoRGB(value);
-    });
-
-    hsv4.onChange(function (value) {
-        color4 = HSVtoRGB(value);
-    });
-
-    hsv5.onChange(function (value) {
-        color5 = HSVtoRGB(value);
-    });
-
-    hsv6.onChange(function (value) {
-        color6 = HSVtoRGB(value);
-    });
-
-    hsv7.onChange(function (value) {
-        color7 = HSVtoRGB(value);
-    });
-
-    hsv8.onChange(function (value) {
-        color8 = HSVtoRGB(value);
-    });
-
-    hsv9.onChange(function (value) {
-        color9 = HSVtoRGB(value);
-    });
-
-    hsv10.onChange(function (value) {
-        color10 = HSVtoRGB(value);
     });
 
     var folder3 = gui.addFolder('scales');
@@ -298,14 +242,6 @@ var drawScene = function () {
 
     shaderProgram.SetUniformColor("color1", color1);
     shaderProgram.SetUniformColor("color2", color2);
-    shaderProgram.SetUniformColor("color3", color3);
-    shaderProgram.SetUniformColor("color4", color4);
-    shaderProgram.SetUniformColor("color5", color5);
-    shaderProgram.SetUniformColor("color6", color6);
-    shaderProgram.SetUniformColor("color7", color7);
-    shaderProgram.SetUniformColor("color8", color8);
-    shaderProgram.SetUniformColor("color9", color9);
-    shaderProgram.SetUniformColor("color10", color10);
 
     shaderProgram.SetUniformVec3("fScales", [
         Math.pow(10., scales.gyroidA),
