@@ -2,7 +2,7 @@
 #define MAX_DIST 200.
 #define SURF_DIST .001
 #define TAU 6.283185
-#define UNDERSTEP .25
+#define UNDERSTEP .5
 
 // webgl parameters
 precision mediump float;
@@ -53,6 +53,7 @@ const vec4 planeSecB = vec4(1.0,0.,0.,.5*brickL);
 
 const vec4 planeBottom = vec4(0.,-1.,0.,.5*brickH);
 const vec4 planeTop = vec4(0.,1.,0,.5*brickH);
+const vec4 planeConeTop = vec4(0.,1.,0,pinHeight-.5*brickH);
 
 const vec4 b_pln = vec4(.0, 0., 1., 10.);
 const vec4 b_pln_ref = vec4(.0, 0., 1., 9.0);
@@ -60,6 +61,14 @@ const vec4 b_pln_ref = vec4(.0, 0., 1., 9.0);
 const float backgroundD = MAX_DIST*.5;
 const vec3 backgroundColor = vec3(0.07058823529411765, 0.0392156862745098, 0.5607843137254902);
 const vec3 objColor = vec3(0.6627450980392157, 0.06666666666666667, 0.00392156862745098);
+
+const float tang = pinHeight / (pinBottomR - pinTopR);
+const float delta = tang * pinBottomR;
+const float angle = atan(tang);
+const vec2 csVec = vec2(cos(angle), sin(angle));
+
+const vec3 pinMidA = vec3(-.5*pinSpacing,delta-.5*brickL,0);
+const vec3 pinMidB = vec3( .5*pinSpacing,delta-.5*brickL,0);
 
 float intersectSDF(float distA, float distB) {
     return max(distA, distB);
@@ -119,29 +128,16 @@ float sdBands(vec3 p) {
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
     float d = dot(sin(p), cos(p.yzx) );
-    // float d = abs(dot(sin(p), cos(p.yzx) ) + THICKNESS) ;
-    // float d = abs(dot(sin(p), cos(p.yzx))+bias)-thickness;
-    // d += 3.0;
     d *= .3333;
 	return d;
 }
 
-float sdCappedCone(vec3 p, vec3 a, vec3 b, float ra, float rb)
+float sdCone( vec3 p, vec2 c )
 {
-    float rba  = rb-ra;
-    float baba = dot(b-a,b-a);
-    float papa = dot(p-a,p-a);
-    float paba = dot(p-a,b-a)/baba;
-    float x = sqrt( papa - paba*paba*baba );
-    float cax = max(0.0,x-((paba<0.5)?ra:rb));
-    float cay = abs(paba-0.5)-0.5;
-    float k = rba*rba + baba;
-    float f = clamp( (rba*(x-ra)+paba*baba)/k, 0.0, 1.0 );
-    float cbx = x-ra - f*rba;
-    float cby = paba - f;
-    float s = (cbx < 0.0 && cay < 0.0) ? -1.0 : 1.0;
-    return s*sqrt( min(cax*cax + cay*cay*baba,
-                       cbx*cbx + cby*cby*baba) );
+    // c is the sin/cos of the angle
+    vec2 q = vec2( length(p.xz), -p.y );
+    float d = length(q-c*max(dot(q,c), 0.0));
+    return abs(d * ((q.x*c.y-q.y*c.x<0.0)?-1.0:1.0));
 }
 
 float sdCookie(vec3 p) {
@@ -152,9 +148,16 @@ float sdCookie(vec3 p) {
     d=differenceSDF(d, d);
 
     float d_t=sdPlane(p, planeTop);
-    float d_b=sdPlane(p, planeBottom);
+    d = intersectSDF(d, d_t);
 
-    d=intersectSDF(intersectSDF(d, d_t), d_b);
+    d=unionSDF(sdCone(p - pinMidA, csVec), d);
+    d=unionSDF(sdCone(p - pinMidB, csVec), d);
+
+    float d_b=sdPlane(p, planeBottom);
+    float d_cb=sdPlane(p, planeConeTop);
+
+    d=intersectSDF(d, d_cb);
+    d=intersectSDF(d, d_b);
 
     return d;
 }
@@ -163,8 +166,7 @@ float GetDist(vec3 p) {
     // return sdCookie(p);
     p*=globalScale;
     float d=sdCookie(p);
-    d=unionSDF(sdCappedCone(p, pinAStart, pinAEnd, pinBottomR, pinTopR), d);
-    d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
+    // d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
 
     d+=sdBands(p);
     return d*globalScale;
@@ -183,19 +185,6 @@ float RayMarch(vec3 ro, vec3 rd) {
 
     return d0;
 }
-// vec3 GetNormal(vec3 p) {
-// 	float d = GetDist(p);
-//     vec2 e = vec2(.01, 0);
-    
-//     vec3 n = d - vec3(
-//         GetDist(p-e.xyy),
-//         GetDist(p-e.yxy),
-//         GetDist(p-e.yyx)
-//     );
-    
-//     return -normalize(n);
-//     // return abs(normalize(n) );
-// }
 
 vec3 GetNormal(vec3 p)
 {
@@ -209,17 +198,8 @@ vec3 GetNormal(vec3 p)
          
     return normalize(n);
 }
-
-// float GetLight(vec3 p, vec3 n);
-
 float GetLight(vec3 p)
 {
-    // Diffuse Color
-    // vec3 color = c.rgb * colorIntensity;
- 
-    // Directional light
-    // vec3 lightPos=vec3(5.*sin(u_time),5.,6.+5.*cos(u_time));// Light Position
- 
     vec3 l=normalize(lightPos-p);// Light Vector
     vec3 n=GetNormal(p);// Normal Vector
      
