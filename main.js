@@ -253,6 +253,7 @@ var initCanvas = function () {
     var folder5 = gui.addFolder('shader');
     folder5.add(shader, 'type', [
         "gyroid",
+        "gyroidCylinder",
         "indexedGyroid",
         "gyroidSmooth",
         "schwarzDPPGradient",
@@ -339,6 +340,8 @@ function switchShader() {
 
     if (shader.type == "gyroid") {
         frag = 'fragShader'
+    } else if (shader.type == "gyroidCylinder") {
+        frag = 'gyroidCylinder'
     } else if (shader.type == "indexedGyroid") {
         frag = 'gyroidIndexed'
     } else if (shader.type == "schwarzDPPIndexed") {
@@ -350,7 +353,7 @@ function switchShader() {
     } else if (shader.type == "gyroidSmooth") {
         frag = 'gyroidSmooth'
     }
-    
+
     shaderProgram = new Shader('vertShader', frag);
     // Activate the shader program
     shaderProgram.UseProgram();
