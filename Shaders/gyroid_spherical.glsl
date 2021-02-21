@@ -77,12 +77,22 @@ vec3 rotate(vec3 p) {
     return rotate(p, alpha);
 }
 
+vec3 uvMapping(vec2 uv){
+    float alfa = uv.x*pScales.x;
+    float beta = uv.y*pScales.y;
+    vec3 v3 = vec3(cos(alfa)*pScales.z, sin(alfa)*pScales.z, sin(beta));
+    return v3;
+}
+
 void main()
 {
     vec2 scaledVec = (gl_FragCoord.xy - resolution * .5) * globalScale;
+    // scaledVec = scaledVec - mod(scaledVec, pixelResolution.xy);
+    // p.z = p.z + zHeight;
     vec3 p = vec3(scaledVec, zHeight);
     
     p = translate( rotate( p ) );
+    p = uvMapping(p.xy);
     
     float d = GetDist(p);
     

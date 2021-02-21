@@ -79,7 +79,9 @@ vec3 rotate(vec3 p) {
 
 void main()
 {
-    vec3 p = vec3(gl_FragCoord.xy, zHeight);
+    vec2 scaledVec = (gl_FragCoord.xy - resolution * .5) * globalScale;
+    vec3 p = vec3(scaledVec, zHeight);
+    
     p = translate( rotate( p ) );
     
     float d = GetDist(p * globalScale);
