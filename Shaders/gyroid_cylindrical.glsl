@@ -29,8 +29,8 @@ uniform vec3 pixelResolution;
 uniform float globalScale;
 
 // cylinder
-uniform int cylinderMultiplierN;
-uniform int cylinderMultiplierM;
+uniform float cylinderMultiplierN;
+uniform float cylinderMultiplierM;
 uniform float cylinderRadiusBase;
 
 float sdGyroid(vec3 p, float scale) {
@@ -84,7 +84,7 @@ vec3 rotate(vec3 p) {
 
 vec3 uvMapping(vec2 uv){
     float alfa = uv.x*pScales.x;
-    float r = (cylinderRadiusBase+cos(pi+alfa*cylinderMultiplierM)*cos(pi+alfa*cylinderMultiplierN));
+    float r = cylinderRadiusBase+cos(pi+alfa*cylinderMultiplierM)*cos(pi+alfa*cylinderMultiplierN);
     r = r * pScales.z;
     vec3 v3 = vec3(cos(alfa)*r, sin(alfa)*r, uv.y*pScales.y);
     return v3;
