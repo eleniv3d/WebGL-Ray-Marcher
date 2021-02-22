@@ -72,6 +72,12 @@ var posBase = new function() {
     this.y = 0;
 }
 
+var cylinderProfile = new function() {
+    this.base = 1.5;
+    this.m = 0;
+    this.n = 0;
+}
+
 // start() is the main function that gets called first by index.html
 var start = function () {
 
@@ -241,7 +247,9 @@ var initCanvas = function () {
     folder3.add(scales, 'periodA', -3.00, 5.00);
     folder3.add(scales, 'periodB', -3.00, 5.00);
     folder3.add(scales, 'periodC', -3.00, 5.00);
-    folder3.add(scales, 'zHeight', -1000.00, 1000.00);
+    folder3.add(cylinderProfile, 'base', -10., 10.);
+    folder3.add(cylinderProfile, 'm', 0, 20);
+    folder3.add(cylinderProfile, 'n', 0, 20);
     folder3.add(scales, 'globalScale', -4.00, 4.00);
 
     var folder4 = gui.addFolder('moving');
@@ -318,8 +326,10 @@ var drawScene = function () {
 
     shaderProgram.SetUniform1f("globalScale", scales.globalScale);
 
+    shaderProgram.SetUniform1f("cylinderRadiusBase", scales.base);
+    shaderProgram.SetUniformInt("cylinderMultiplierM", scales.m);
+    shaderProgram.SetUniformInt("cylinderMultiplierN", scales.m);
 
-    shaderProgram.SetUniform1f("zHeight", scales.zHeight);
     shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1.);
     shaderProgram.SetUniformVec3("pixelResolution", [
         Math.floor(abstractionLevel.resolution),
