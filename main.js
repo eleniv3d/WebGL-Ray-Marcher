@@ -328,7 +328,7 @@ var drawScene = function () {
 
     shaderProgram.SetUniform1f("cylinderRadiusBase", cylinderProfile.base);
     shaderProgram.SetUniformInt("cylinderMultiplierM", cylinderProfile.m);
-    shaderProgram.SetUniformInt("cylinderMultiplierN", cylinderProfile.m);
+    shaderProgram.SetUniformInt("cylinderMultiplierN", cylinderProfile.n);
 
     shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1.);
     shaderProgram.SetUniformVec3("pixelResolution", [

@@ -92,7 +92,9 @@ class Shader
      */
     SetUniformInt(uniformName, integer) 
     {
-        gl.uniform1f(gl.getUniformLocation(this.shaderProgram, integer), Math.floor(integer+.5) );
+        var roundedInt = Math.floor(integer+.5);
+        console.log("roundInt "+uniformName+": "+roundedInt);
+        gl.uniform1f(gl.getUniformLocation(this.shaderProgram, uniformName), roundedInt);
     }
 
     /**
