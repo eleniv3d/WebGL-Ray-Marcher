@@ -42,7 +42,14 @@ var abstractionLevel = new function () {
     this.resolution = 2.;
 }
 
-var transformation = new function () {
+var transformationP = new function () {
+    this.x = 0.0;
+    this.y = 0.0;
+    this.z = 0.0;
+    this.rz = 0.0;
+}
+
+var transformationUV = new function () {
     this.x = 0.0;
     this.y = 0.0;
     this.z = 0.0;
@@ -54,7 +61,7 @@ function powF(value) {
 }
 
 var shader = new function () {
-    this.type = "gyroid";
+    this.type = "gyroidCylinder";
 }
 
 var posActive = new function () {
@@ -252,14 +259,20 @@ var initCanvas = function () {
     folder3.add(cylinderProfile, 'n', 0, 20);
     folder3.add(scales, 'globalScale', -4.00, 4.00);
 
-    var folder4 = gui.addFolder('moving');
-    folder4.add(transformation, 'x', 0., 5.);
-    folder4.add(transformation, 'y', 0., 5.);
-    folder4.add(transformation, 'z', 0., 5.);
-    folder4.add(transformation, 'rz', -3.1415927, 3.1415927);
+    var folder4 = gui.addFolder('movingUV');
+    folder4.add(transformationUV, 'x', 0., 5.);
+    folder4.add(transformationUV, 'y', 0., 5.);
+    folder4.add(transformationUV, 'z', 0., 5.);
+    folder4.add(transformationUV, 'rz', -3.1415927, 3.1415927);
 
-    var folder5 = gui.addFolder('shader');
-    folder5.add(shader, 'type', [
+    var folder5 = gui.addFolder('movingP');
+    folder5.add(transformationP, 'x', 0., 5.);
+    folder5.add(transformationP, 'y', 0., 5.);
+    folder5.add(transformationP, 'z', 0., 5.);
+    folder5.add(transformationP, 'rz', -3.1415927, 3.1415927);
+
+    var folder6 = gui.addFolder('shader');
+    folder6.add(shader, 'type', [
         "gyroid",
         "gyroidCylinder",
         "indexedGyroid",
@@ -271,9 +284,9 @@ var initCanvas = function () {
         switchShader(shader);
     });
 
-    var folder6 = gui.addFolder('abstraction level');
-    folder6.add(abstractionLevel, 'resolution', 1, 10);
-    folder6.add(abstractionLevel, 'steps', 2, 10);
+    var folder7 = gui.addFolder('abstraction level');
+    folder7.add(abstractionLevel, 'resolution', 1, 10);
+    folder7.add(abstractionLevel, 'steps', 2, 10);
 }
 
 var drawScene = function () {
@@ -337,8 +350,19 @@ var drawScene = function () {
         Math.floor(abstractionLevel.resolution)
     ]);
 
-    shaderProgram.SetUniform1f("alpha", transformation.rz);
-    shaderProgram.SetUniformVec3("mvVec", [Math.pow(10., transformation.x), Math.pow(10., transformation.y), Math.pow(10., transformation.z)]);
+    shaderProgram.SetUniform1f("alpha", transformationP.rz);
+
+    shaderProgram.SetUniformVec3("mvVecUV", [
+        Math.pow(10., transformationUV.x),
+        Math.pow(10., transformationUV.y),
+        Math.pow(10., transformationUV.z)
+    ]);
+
+    shaderProgram.SetUniformVec3("mvVecP", [
+        Math.pow(10., transformationP.x),
+        Math.pow(10., transformationP.y),
+        Math.pow(10., transformationP.z)
+    ]);
 
     // Tell WebGL to draw the scene
     mesh.Draw();
@@ -349,9 +373,9 @@ var drawScene = function () {
 function switchShader() {
 
     if (shader.type == "gyroid") {
-        frag = 'fragShader'
+        frag = 'gyroid'
     } else if (shader.type == "gyroidCylinder") {
-        frag = 'gyroidCylinder'
+        frag = 'fragShader'
     } else if (shader.type == "indexedGyroid") {
         frag = 'gyroidIndexed'
     } else if (shader.type == "schwarzDPPIndexed") {

@@ -11,7 +11,8 @@ const float pi = 3.1415926536;
 const float staticZ = 0.;
 
 // general transformation
-uniform vec3 mvVec;
+uniform vec3 mvVecUV;
+uniform vec3 mvVecP;
 uniform float alpha;
 
 // function parameters
@@ -66,9 +67,9 @@ vec3 translate(vec3 p, vec3 mv) {
     return (p + mv);
 }
 
-vec3 translate(vec3 p) {
-    return translate(p, mvVec);
-}
+// vec3 translate(vec3 p) {
+//     return 
+// }
 
 vec3 rotate(vec3 p, float a) {
     return vec3(
@@ -90,15 +91,23 @@ vec3 uvMapping(vec2 uv){
     return v3;
 }
 
+vec3 translateForUV(vec3 p){
+    p = translate( p, mvVecUV);
+    return uvMapping(p.xy);
+}
+
+vec3 translateForDistance(vec3 p) {
+    return translate( rotate( p ), mvVecP);
+}
+
+vec3 positionManagement(vec3 p){
+    vec3 uv = translateForUV(p);
+    return translateForDistance(uv);
+}
+
 void main()
 {
-    vec2 scaledVec = (gl_FragCoord.xy - resolution * .5) * globalScale;
-    // scaledVec = scaledVec - mod(scaledVec, pixelResolution.xy);
-    // p.z = p.z + zHeight;
-    vec3 p = vec3(scaledVec, zHeight);
-    
-    p = translate( rotate( p ) );
-    p = uvMapping(p.xy);
+    vec3 p = positionManagement(vec3((gl_FragCoord.xy-resolution * .5)*globalScale, zHeight));
     
     float d = GetDist(p);
     
