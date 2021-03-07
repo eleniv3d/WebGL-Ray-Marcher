@@ -17,6 +17,9 @@ uniform vec3 fScales;
 uniform float globalScale;
 uniform vec3 pScales;
 
+// movement vectors
+uniform vec3 mvVec;
+
 // colors
 uniform vec3 color1;
 uniform vec3 color2;
@@ -70,7 +73,9 @@ const vec2 csVec = vec2(cos(angle), sin(angle));
 const vec3 pinMidA = vec3(-.5*pinSpacing,delta-.5*brickL,0);
 const vec3 pinMidB = vec3( .5*pinSpacing,delta-.5*brickL,0);
 
-// vec3 pointTransformation(p)
+vec3 pointTransformation(vec3 p){
+    return vec3(p.x, p.z, -p.y);
+}
 
 float intersectSDF(float distA, float distB) {
     return max(distA, distB);
@@ -165,7 +170,7 @@ float sdCookie(vec3 p) {
 }
 
 float sdBox(vec3 p, vec3 bPt, vec3 cPt) {
-    vec3 q = abs(p-bPt)-cPt;
+    vec3 q = abs(p+bPt)-cPt;
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
@@ -177,7 +182,8 @@ float GetDist(vec3 p) {
 
     // d+=sdBands(p);
     // return d*globalScale;
-    return sdBox(p, vec3(-1,-1,0), vec3(1,1,2));
+    p = pointTransformation(p);
+    return sdBox(p, mvVec, vec3(1,1,2));
 }
 
 float RayMarch(vec3 ro, vec3 rd) {
@@ -198,11 +204,11 @@ vec3 GetNormal(vec3 p)
 {
     float d=GetDist(p);// Distance
     vec2 e=vec2(.01,0);// Epsilon
-     
+    
     vec3 n=d-vec3(
         GetDist(p-e.xyy),// e.xyy is the same as vec3(.01,0,0). The x of e is .01. this is called a swizzle
-        GetDist(p-e.yxy),
-        GetDist(p-e.yyx));
+        GetDist(p-e.yyx),
+        GetDist(e.yxy-p));
          
     return normalize(n);
 }
@@ -237,7 +243,7 @@ void main()
     vec2 uv = (gl_FragCoord.xy - .5 * resolution.xy) / resolution.y;
     vec2 m = mousePosition / resolution.xy;
 
-    vec3 ro = vec3(5., 1., 0.);
+    vec3 ro = vec3(-5., 1., 5.);
     ro.yx *= Rot(-m.y);
     ro.xz *= Rot(-m.x);
     // ro.xz *= Rot(5.3 + m.x * TAU);
@@ -253,7 +259,6 @@ void main()
     } else {
         n = color1;
     }
-    
 
     gl_FragColor = vec4(n, 1.);
 }

@@ -189,9 +189,9 @@ var initCanvas = function () {
     folder3.add(scales, 'globalScale', -4.00, 4.00);
 
     var folder4 = gui.addFolder('moving');
-    folder4.add(transformation, 'x', 0., 5.);
-    folder4.add(transformation, 'y', 0., 5.);
-    folder4.add(transformation, 'z', 0., 5.);
+    folder4.add(transformation, 'x', -10, 10);
+    folder4.add(transformation, 'y', -10, 10);
+    folder4.add(transformation, 'z', -10, 10);
     folder4.add(transformation, 'rz', -3.1415927, 3.1415927);
 
     var folder5 = gui.addFolder('shader');
@@ -260,7 +260,7 @@ var drawScene = function () {
     ]);
 
     shaderProgram.SetUniform1f("alpha", transformation.rz);
-    shaderProgram.SetUniformVec3("mvVec", [Math.pow(10., transformation.x), Math.pow(10., transformation.y), Math.pow(10., transformation.z)]);
+    shaderProgram.SetUniformVec3("mvVec", [transformation.x, transformation.y, transformation.z]);
 
     // Tell WebGL to draw the scene
     mesh.Draw();
