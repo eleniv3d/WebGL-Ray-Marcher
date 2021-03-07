@@ -147,7 +147,7 @@ float sdCone( vec3 p, vec2 c )
     return abs(d * ((q.x*c.y-q.y*c.x<0.0)?-1.0:1.0));
 }
 
-float sdCookie(vec3 p) {
+float sdRoundCookie(vec3 p) {
     float d=sdLine(p, cylinderA, cylinderB)-brickW;
 
     float d_g=.3*sdGyroid(p, fScales.x*sdGyroid(p, fScales.y));
@@ -175,14 +175,14 @@ float sdBox(vec3 p, vec3 bPt, vec3 cPt) {
 }
 
 float GetDist(vec3 p) {
-    // // return sdCookie(p);
-    // p*=globalScale;
-    // float d=sdCookie(p);
-    // // d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
+    p = pointTransformation(p)+mvVec;
+    // return sdCookie(p);
+    p*=globalScale;
+    float d=sdRoundCookie(p);
+    // d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
 
-    // d+=sdBands(p);
-    // return d*globalScale;
-    p = pointTransformation(p);
+    d+=sdBands(p);
+    return d*globalScale;
     return sdBox(p, mvVec, vec3(1,1,2));
 }
 
@@ -207,9 +207,11 @@ vec3 GetNormal(vec3 p)
     
     vec3 n=d-vec3(
         GetDist(p-e.xyy),// e.xyy is the same as vec3(.01,0,0). The x of e is .01. this is called a swizzle
-        GetDist(p-e.yyx),
-        GetDist(e.yxy-p));
-         
+        GetDist(p-e.yxy),
+        GetDist(p-e.yyx));
+
+    n=vec3(n.xz, -n.y);
+
     return normalize(n);
 }
 float GetLight(vec3 p)
