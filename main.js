@@ -21,6 +21,14 @@ var scales = new function () {
     this.globalScale = 1;
 }
 
+var brickParameters = new function () {
+    this.width = 1.;
+    this.length = .75;
+    this.height = .7;
+    this.thickness = .15;
+    this.angle = .75;
+}
+
 var abstractionLevel = new function () {
     this.steps = 8;
     this.resolution = 2.;
@@ -194,6 +202,13 @@ var initCanvas = function () {
     folder4.add(transformation, 'z', -10, 10);
     folder4.add(transformation, 'rz', -3.1415927, 3.1415927);
 
+    var brickFolder = gui.addFolder('brick parameters');
+    brickFolder.add(brickParameters, 'width', 0.00, 2.00);
+    brickFolder.add(brickParameters, 'height', 0.00, 2.00);
+    brickFolder.add(brickParameters, 'thickness', 0.00, 2.00);
+    brickFolder.add(brickParameters, 'height', 0, 2.00);
+    brickFolder.add(brickParameters, 'angle', -1.5, 1.5);
+
     var folder5 = gui.addFolder('shader');
     folder5.add(shader, 'type', [
         "clouded",
@@ -250,7 +265,6 @@ var drawScene = function () {
 
     shaderProgram.SetUniform1f("globalScale", scales.globalScale);
 
-
     shaderProgram.SetUniform1f("zHeight", scales.zHeight);
     shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1.);
     shaderProgram.SetUniformVec3("pixelResolution", [
@@ -258,6 +272,11 @@ var drawScene = function () {
         Math.floor(abstractionLevel.resolution),
         Math.floor(abstractionLevel.resolution)
     ]);
+
+    shaderProgram.SetUniformVec2("wL", [brickParameters.width, brickParameters.length])
+    shaderProgram.SetUniformVec2("th", [brickParameters.thickness, brickParameters.thickness])
+    shaderProgram.SetUniform1f("h", brickParameters.height);
+    shaderProgram.SetUniform1f("a", brickParameters.angle);
 
     shaderProgram.SetUniform1f("alpha", transformation.rz);
     shaderProgram.SetUniformVec3("mvVec", [transformation.x, transformation.y, transformation.z]);

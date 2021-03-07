@@ -29,21 +29,21 @@ const float inverseClampScale = 1. / clampScale;
 const vec3 lightPos = vec3(15.);
 
 // brick parameters
-uniform vec2 wH;
+uniform vec2 wL;
 uniform vec2 th;
 uniform float h;
 
-const vec4 sdPA = vec4(0,0,-1,0);
-vec4 sdPB = vec4(0,0, 1,h);
+uniform float a;
+vec3 alphaCST = vec3(cos(a), sin(a), tan(a));
+
+const vec4 sdPA = vec4(0,0,1,0);
+vec4 sdPB = vec4(0,0,-1,h);
 
 const float backgroundD = MAX_DIST*.5;
 // const vec3 backgroundColor = vec3(0.07058823529411765, 0.0392156862745098, 0.5607843137254902);
 // const vec3 objColor = vec3(0.6627450980392157, 0.06666666666666667, 0.00392156862745098);
 
 // angle
-const float angle = .5;
-const vec3 alphaCST = vec3(cos(angle), sin(angle), tan(angle));
-
 vec3 pointTransformation(vec3 p){
     return vec3(p.x, p.z, -p.y);
 }
@@ -129,17 +129,20 @@ float sdCone( vec3 p, vec2 c )
 }
 
 float sdCookie(vec3 p) {
-    vec2 baseVec = vec2(5,2);
+    // vec2 baseVec = vec2(5,2);
 
-    float sdTR = sdTaperedRec(p, baseVec, alphaCST);
-    float dBox = sdRec(p.xy, baseVec - vec2(2));
+    float sdTR = sdTaperedRec(p, wL, alphaCST);
+    float dBox = sdRec(p.xy, wL - vec2(th));
     
     float sdPA = sdPlane(p, sdPA);
     float sdPB = sdPlane(p, sdPB);
 
-    float d= min(sdTR, dBox);
-    d = max(-sdPA, d);
-    d = max(-sdPB, d);
+    float dP = -max(sdPA, sdPB);
+
+    float d = min(dBox, sdTR);
+    d = max(-dP, d);
+    // d = max(sdPA, -d);
+    // d = max(sdPB, -d);
 
     return d;
 }
