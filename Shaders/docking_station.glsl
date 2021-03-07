@@ -28,6 +28,7 @@ const float clampScale = 1.;
 const float inverseClampScale = 1. / clampScale;
 const vec3 lightPos = vec3(15.);
 
+// brick parameters
 const float bandHeight = .02;
 const float doubleBH = bandHeight * 2.;
 const float squareBH = bandHeight * bandHeight;
@@ -42,36 +43,13 @@ const float brickL = 2.;
 const float brickW = 1.;
 const float brickH = 2.;
 
-const vec3 pinAStart = vec3(-.5*pinSpacing,-.5*brickL,0);
-const vec3 pinAEnd = vec3(-.5*pinSpacing,pinHeight-.5*brickL,0);
-const vec3 pinBStart = vec3(.5*pinSpacing,-.5*brickL,0);
-const vec3 pinBEnd = vec3(.5*pinSpacing,pinHeight-.5*brickL,0);
-
-const vec2 cylinderA = vec2(-.5*brickL,0);
-const vec2 cylinderB = vec2(.5*brickL,0);
-
-const vec4 planeMain = vec4(0.,0.,1.,0);
-const vec4 planeSecA = vec4(-1.0,0.,0.,.5*brickL);
-const vec4 planeSecB = vec4(1.0,0.,0.,.5*brickL);
-
-const vec4 planeBottom = vec4(0.,-1.,0.,.5*brickH);
-const vec4 planeTop = vec4(0.,1.,0,.5*brickH);
-const vec4 planeConeTop = vec4(0.,1.,0,pinHeight-.5*brickH);
-
-const vec4 b_pln = vec4(.0, 0., 1., 10.);
-const vec4 b_pln_ref = vec4(.0, 0., 1., 9.0);
-
 const float backgroundD = MAX_DIST*.5;
-const vec3 backgroundColor = vec3(0.07058823529411765, 0.0392156862745098, 0.5607843137254902);
-const vec3 objColor = vec3(0.6627450980392157, 0.06666666666666667, 0.00392156862745098);
+// const vec3 backgroundColor = vec3(0.07058823529411765, 0.0392156862745098, 0.5607843137254902);
+// const vec3 objColor = vec3(0.6627450980392157, 0.06666666666666667, 0.00392156862745098);
 
-const float tang = pinHeight / (pinBottomR - pinTopR);
-const float delta = tang * pinBottomR;
-const float angle = atan(tang);
-const vec2 csVec = vec2(cos(angle), sin(angle));
-
-const vec3 pinMidA = vec3(-.5*pinSpacing,delta-.5*brickL,0);
-const vec3 pinMidB = vec3( .5*pinSpacing,delta-.5*brickL,0);
+// angle
+const float angle = 1.0;
+const vec3 alphaCST = vec3(cos(angle), sin(angle), tan(angle));
 
 vec3 pointTransformation(vec3 p){
     return vec3(p.x, p.z, -p.y);
@@ -87,6 +65,16 @@ float unionSDF(float distA, float distB) {
  
 float differenceSDF(float distA, float distB) {
     return max(distA, -distB);
+}
+
+float sdRec(vec2 p, vec2 cPt) {
+    vec2 q = abs(p)-cPt;
+    return length(max(q,0.0)) + min(max(q.x,q.y),0.0);
+}
+
+float sdTaperedRec(vec3 p, vec2 cPt, vec3 alfaCST) {
+    cPt-=vec2(-p.z*alfaCST.x);
+    return sdRec(p.xy, cPt)*alfaCST.z;
 }
 
 float sdLine(vec2 p, vec2 a, vec2 b) {
@@ -147,43 +135,49 @@ float sdCone( vec3 p, vec2 c )
     return abs(d * ((q.x*c.y-q.y*c.x<0.0)?-1.0:1.0));
 }
 
-float sdRoundCookie(vec3 p) {
-    float d=sdLine(p, cylinderA, cylinderB)-brickW;
+// float sdRoundCookie(vec3 p) {
+//     float d=sdLine(p, cylinderA, cylinderB)-brickW;
 
-    float d_g=.3*sdGyroid(p, fScales.x*sdGyroid(p, fScales.y));
-    d+=d_g;
-    d=differenceSDF(d, d);
+//     float d_g=.3*sdGyroid(p, fScales.x*sdGyroid(p, fScales.y));
+//     d+=d_g;
+//     d=differenceSDF(d, d);
 
-    float d_t=sdPlane(p, planeTop);
-    d = intersectSDF(d, d_t);
+//     float d_t=sdPlane(p, planeTop);
+//     d = intersectSDF(d, d_t);
 
-    d=unionSDF(sdCone(p - pinMidA, csVec), d);
-    d=unionSDF(sdCone(p - pinMidB, csVec), d);
+//     d=unionSDF(sdCone(p - pinMidA, csVec), d);
+//     d=unionSDF(sdCone(p - pinMidB, csVec), d);
 
-    float d_b=sdPlane(p, planeBottom);
-    float d_cb=sdPlane(p, planeConeTop);
+//     float d_b=sdPlane(p, planeBottom);
+//     float d_cb=sdPlane(p, planeConeTop);
 
-    d=intersectSDF(d, d_cb);
-    d=intersectSDF(d, d_b);
+//     d=intersectSDF(d, d_cb);
+//     d=intersectSDF(d, d_b);
 
-    return d;
-}
+//     return d;
+// }
 
 float sdBox(vec3 p, vec3 bPt, vec3 cPt) {
     vec3 q = abs(p+bPt)-cPt;
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+float sdBox(vec3 p, vec3 cPt) {
+    vec3 q = abs(p)-cPt;
+    return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+}
+
 float GetDist(vec3 p) {
     p = pointTransformation(p)+mvVec;
     // return sdCookie(p);
-    p*=globalScale;
-    float d=sdRoundCookie(p);
-    // d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
+    // p*=globalScale;
+    // float d=sdRoundCookie(p);
+    // // d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
 
-    d+=sdBands(p);
-    return d*globalScale;
-    return sdBox(p, mvVec, vec3(1,1,2));
+    // d+=sdBands(p);
+    // return d*globalScale;
+    return sdTaperedRec(p, vec2(1,2), alphaCST);
+    return sdBox(p, vec3(1,1,2));
 }
 
 float RayMarch(vec3 ro, vec3 rd) {
@@ -214,6 +208,7 @@ vec3 GetNormal(vec3 p)
 
     return normalize(n);
 }
+
 float GetLight(vec3 p)
 {
     vec3 l=normalize(lightPos-p);// Light Vector
