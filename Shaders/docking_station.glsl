@@ -70,6 +70,8 @@ const vec2 csVec = vec2(cos(angle), sin(angle));
 const vec3 pinMidA = vec3(-.5*pinSpacing,delta-.5*brickL,0);
 const vec3 pinMidB = vec3( .5*pinSpacing,delta-.5*brickL,0);
 
+// vec3 pointTransformation(p)
+
 float intersectSDF(float distA, float distB) {
     return max(distA, distB);
 }
@@ -162,14 +164,20 @@ float sdCookie(vec3 p) {
     return d;
 }
 
-float GetDist(vec3 p) {
-    // return sdCookie(p);
-    p*=globalScale;
-    float d=sdCookie(p);
-    // d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
+float sdBox(vec3 p, vec3 bPt, vec3 cPt) {
+    vec3 q = abs(p-bPt)-cPt;
+    return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+}
 
-    d+=sdBands(p);
-    return d*globalScale;
+float GetDist(vec3 p) {
+    // // return sdCookie(p);
+    // p*=globalScale;
+    // float d=sdCookie(p);
+    // // d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
+
+    // d+=sdBands(p);
+    // return d*globalScale;
+    return sdBox(p, vec3(-1,-1,0), vec3(1,1,2));
 }
 
 float RayMarch(vec3 ro, vec3 rd) {
@@ -239,8 +247,9 @@ void main()
 
     vec3 n;
     if (d < backgroundD) {
-        float l = GetLight(ro+d*rd);
-        n = color2 * clamp(l, .5, 1.);
+        // float l = GetLight(ro+d*rd);
+        // n = 1.5*color2 * clamp(l, .5, 1.);
+        n=abs(GetNormal(ro+d*rd));
     } else {
         n = color1;
     }

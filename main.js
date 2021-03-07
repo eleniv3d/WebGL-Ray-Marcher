@@ -1,6 +1,6 @@
 var mesh, timer, shaderProgram;
 
-posScale = 1.;
+posScale = 2.;
 
 var params = new function () {
     this.color1 = { h: 244, s: .93, v: 0.56 };
@@ -38,7 +38,7 @@ function powF(value) {
 }
 
 var shader = new function () {
-    this.type = "brickShader";
+    this.type = "dockingStation";
 }
 
 var posActive = new function () {
@@ -197,7 +197,8 @@ var initCanvas = function () {
     var folder5 = gui.addFolder('shader');
     folder5.add(shader, 'type', [
         "clouded",
-        "brickShader"
+        "brickShader",
+        "dockingStation"
     ]).onChange( function () {
         switchShader(shader);
     });
@@ -228,8 +229,8 @@ var drawScene = function () {
     shaderProgram.SetUniform1f("time", timer.GetTicksInRadians());
     shaderProgram.SetUniform1f("fractalIncrementer", timer.GetFractalIncrement());
     shaderProgram.SetUniformVec2("mousePosition", [
-        posBase.x+posActive.x,
-        posBase.y+posActive.y
+        posScale*(posBase.x+posActive.x),
+        posScale*(posBase.y+posActive.y)
     ]);
 
     shaderProgram.SetUniformColor("color1", color1);
@@ -270,10 +271,12 @@ var drawScene = function () {
 function switchShader() {
 
     if (shader.type == "brickShader") {
-        frag = 'fragShader'
+        frag = 'clayBrick'
+    } else if (shader.type == "dockingStation") {
+        frag = 'dockingStation'
     } else if (shader.type == "clouded") {
         frag = 'cloudedShader'
-    } 
+    }
     shaderProgram = new Shader('vertShader', frag);
     // Activate the shader program
     shaderProgram.UseProgram();
