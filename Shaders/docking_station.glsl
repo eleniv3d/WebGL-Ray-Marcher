@@ -1,5 +1,5 @@
 #define MAX_STEPS 500
-#define MAX_DIST 200.
+#define MAX_DIST 500.
 #define SURF_DIST .001
 #define TAU 6.283185
 #define UNDERSTEP .5
@@ -29,26 +29,19 @@ const float inverseClampScale = 1. / clampScale;
 const vec3 lightPos = vec3(15.);
 
 // brick parameters
-const float bandHeight = .02;
-const float doubleBH = bandHeight * 2.;
-const float squareBH = bandHeight * bandHeight;
+uniform vec2 wH;
+uniform vec2 th;
+uniform float h;
 
-const float pinSpacing = 2.;
-const float pinHeight = 3.;
-const float tolerance = .01;
-const float pinBottomR = .2;
-const float pinTopR = .1;
-
-const float brickL = 2.;
-const float brickW = 1.;
-const float brickH = 2.;
+const vec4 sdPA = vec4(0,0,-1,0);
+vec4 sdPB = vec4(0,0, 1,h);
 
 const float backgroundD = MAX_DIST*.5;
 // const vec3 backgroundColor = vec3(0.07058823529411765, 0.0392156862745098, 0.5607843137254902);
 // const vec3 objColor = vec3(0.6627450980392157, 0.06666666666666667, 0.00392156862745098);
 
 // angle
-const float angle = 1.0;
+const float angle = .5;
 const vec3 alphaCST = vec3(cos(angle), sin(angle), tan(angle));
 
 vec3 pointTransformation(vec3 p){
@@ -113,12 +106,12 @@ float smin(float a, float b, float k) {
     return mix(b, a, h) - k * h * (1.0 - h);
 }
 
-float sdBands(vec3 p) {
-    float val = mod(p.y, doubleBH);
-    val -= bandHeight;
-    val = sqrt(squareBH - val * val);
-    return -val;
-}
+// float sdBands(vec3 p) {
+//     float val = mod(p.y, doubleBH);
+//     val -= bandHeight;
+//     val = sqrt(squareBH - val * val);
+//     return -val;
+// }
 
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
@@ -133,6 +126,22 @@ float sdCone( vec3 p, vec2 c )
     vec2 q = vec2( length(p.xz), -p.y );
     float d = length(q-c*max(dot(q,c), 0.0));
     return abs(d * ((q.x*c.y-q.y*c.x<0.0)?-1.0:1.0));
+}
+
+float sdCookie(vec3 p) {
+    vec2 baseVec = vec2(5,2);
+
+    float sdTR = sdTaperedRec(p, baseVec, alphaCST);
+    float dBox = sdRec(p.xy, baseVec - vec2(2));
+    
+    float sdPA = sdPlane(p, sdPA);
+    float sdPB = sdPlane(p, sdPB);
+
+    float d= min(sdTR, dBox);
+    d = max(-sdPA, d);
+    d = max(-sdPB, d);
+
+    return d;
 }
 
 // float sdRoundCookie(vec3 p) {
@@ -170,14 +179,14 @@ float sdBox(vec3 p, vec3 cPt) {
 float GetDist(vec3 p) {
     p = pointTransformation(p)+mvVec;
     // return sdCookie(p);
-    // p*=globalScale;
+    p*=globalScale;
     // float d=sdRoundCookie(p);
     // // d=unionSDF(sdCappedCone(p, pinBStart, pinBEnd, pinBottomR, pinTopR), d);
 
     // d+=sdBands(p);
     // return d*globalScale;
-    return sdTaperedRec(p, vec2(1,2), alphaCST);
-    return sdBox(p, vec3(1,1,2));
+    
+    return sdCookie(p);
 }
 
 float RayMarch(vec3 ro, vec3 rd) {
