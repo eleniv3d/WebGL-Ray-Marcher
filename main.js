@@ -275,6 +275,7 @@ var initCanvas = function () {
     folder6.add(shader, 'type', [
         "gyroid",
         "gyroidCylinder",
+        "gyroidCylinderStepped",
         "indexedGyroid",
         "gyroidSmooth",
         "schwarzDPPGradient",
@@ -376,6 +377,8 @@ function switchShader() {
         frag = 'gyroid'
     } else if (shader.type == "gyroidCylinder") {
         frag = 'fragShader'
+    } else if (shader.type == "gyroidCylinderStepped") {
+        frag = 'gyroidCylinderStepped'
     } else if (shader.type == "indexedGyroid") {
         frag = 'gyroidIndexed'
     } else if (shader.type == "schwarzDPPIndexed") {
