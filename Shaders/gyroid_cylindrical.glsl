@@ -67,10 +67,6 @@ vec3 translate(vec3 p, vec3 mv) {
     return (p + mv);
 }
 
-// vec3 translate(vec3 p) {
-//     return 
-// }
-
 vec3 rotate(vec3 p, float a) {
     return vec3(
         p.x * cos(a) - p.y * sin(a),

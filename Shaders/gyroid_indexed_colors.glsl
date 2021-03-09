@@ -5,6 +5,7 @@ uniform float time;
 uniform vec2 resolution;
 uniform float fractalIncrementer;
 
+
 // Gyroid Marching
 const float tau = 6.2831853072;
 const float staticZ = 0.;
@@ -33,7 +34,6 @@ uniform vec3 color10;
 
 // resolution
 uniform vec3 pixelResolution;
-uniform float globalScale;
 
 // vec3 pixelSize = vec3(pixelResolution);
 
@@ -75,7 +75,7 @@ float GetDist(vec3 p) {
 }
 
 float GetDist(vec3 p, float scaleA, float scaleB) {
-    float d_g = sdGyroid(p, scaleB * sdGyroid(p, scaleA) );
+    float d_g = sdSchwarD(p, scaleGyroidB * (1. + sdSchwarD(p, scaleGyroidA) ) );
     return d_g;
 }
 
@@ -135,10 +135,10 @@ vec3 rotate(vec3 p) {
 void main()
 {
     vec3 p = vec3(gl_FragCoord.xy, zHeight);
-    p = p - mod(p, pixelResolution / globalScale);
+    p = p - mod(p, pixelResolution);
     p = translate( rotate( p ) );
     
-    float d = GetDist(p * globalScale);
+    float d = GetDist(p);
     
     vec3 n = colorFromDistance(d * 2.);
 

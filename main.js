@@ -61,7 +61,7 @@ function powF(value) {
 }
 
 var shader = new function () {
-    this.type = "gyroidCylinder";
+    this.type = "gyroidCylinderSmooth";
 }
 
 var posActive = new function () {
@@ -274,7 +274,7 @@ var initCanvas = function () {
     var folder6 = gui.addFolder('shader');
     folder6.add(shader, 'type', [
         "gyroid",
-        "gyroidCylinder",
+        "gyroidCylinderSmooth",
         "gyroidCylinderStepped",
         "indexedGyroid",
         "gyroidSmooth",
@@ -345,6 +345,7 @@ var drawScene = function () {
     shaderProgram.SetUniformInt("cylinderMultiplierN", cylinderProfile.n);
 
     shaderProgram.SetUniform1f("steps", Math.round(abstractionLevel.steps) - 1.);
+    console.log("steps: " + (Math.round(abstractionLevel.steps) - 1.));
     shaderProgram.SetUniformVec3("pixelResolution", [
         Math.floor(abstractionLevel.resolution),
         Math.floor(abstractionLevel.resolution),
@@ -375,8 +376,8 @@ function switchShader() {
 
     if (shader.type == "gyroid") {
         frag = 'gyroid'
-    } else if (shader.type == "gyroidCylinder") {
-        frag = 'fragShader'
+    } else if (shader.type == "gyroidCylinderSmooth") {
+        frag = 'gyroidCylinderSmooth'
     } else if (shader.type == "gyroidCylinderStepped") {
         frag = 'gyroidCylinderStepped'
     } else if (shader.type == "indexedGyroid") {

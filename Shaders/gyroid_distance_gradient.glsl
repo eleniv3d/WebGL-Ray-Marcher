@@ -32,6 +32,7 @@ float sdGyroid(vec3 p, float scale) {
     p *= scale;
     float d = dot(sin(p), cos(p.yzx) );
     d *= .3333;
+    d += 1.;
 	return d;
 }
 

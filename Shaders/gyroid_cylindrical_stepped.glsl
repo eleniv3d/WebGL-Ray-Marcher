@@ -34,10 +34,13 @@ uniform float cylinderMultiplierN;
 uniform float cylinderMultiplierM;
 uniform float cylinderRadiusBase;
 
+vec2 resVec = vec2(pixelResolution / globalScale);
+
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
     float d = dot(sin(p), cos(p.yzx) );
-    d *= .3333;
+    d *= .166666;
+    d += .5;
 	return d;
 }
 
@@ -55,21 +58,9 @@ float GetDist(vec2 p) {
     return GetDist(vec3(p, staticZ));
 }
 
-vec3 colorFromDistance(float d) {
-    // float dRemap = float(floor( ( d * .5 + .5) * steps + .5 ) ) / steps;
-    float dRemap = d * .5 + .5;
-    vec3 color = mix(color1,color2, dRemap );
-
-    return color;
-}
-
 vec3 translate(vec3 p, vec3 mv) {
     return (p + mv);
 }
-
-// vec3 translate(vec3 p) {
-//     return 
-// }
 
 vec3 rotate(vec3 p, float a) {
     return vec3(
@@ -105,15 +96,29 @@ vec3 positionManagement(vec3 p){
     return translateForDistance(uv);
 }
 
+vec2 resModding(vec2 frag) {
+    return frag - mod(frag, resVec);
+}
+
+vec3 colorFromDistance(float d) {
+    // float dRemap = float(floor( ( d * .5 + .5) * steps + .5 ) ) / steps;
+    vec3 color = mix(color1,color2, d );
+
+    return color;
+}
+
+vec3 colorStepped(float d){
+    d=floor(d * steps)/steps;
+    return colorFromDistance(d);
+}
+
 void main()
 {
-    vec3 p = vec3(gl_FragCoord.xy, zHeight);
-    p = p - mod(p, pixelResolution / globalScale);
-    p = translate( rotate( p ) );
+    vec3 p = positionManagement(vec3((resModding(gl_FragCoord.xy)-resolution * .5)*globalScale, zHeight));
     
-    float d = GetDist(p * globalScale);
+    float d = GetDist(p);
     
-    vec3 n = colorFromDistance(d * 2.);
+    vec3 n = colorStepped(d * 2.);
 
     gl_FragColor = vec4(n, 1.);
 }
