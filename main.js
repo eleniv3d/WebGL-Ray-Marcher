@@ -64,6 +64,22 @@ var posBase = new function() {
     this.y = 0;
 }
 
+var bottomRec = new function() {
+    this.w = .2;
+    this.h = .15;
+    this.s = 0.;
+}
+
+var topRec = new function() {
+    this.w = .6;
+    this.h = .2;
+    this.s = .4;
+}
+
+var interlock = new function() {
+    this.thickness = .1;
+}
+
 // start() is the main function that gets called first by index.html
 var start = function () {
 
@@ -209,6 +225,14 @@ var initCanvas = function () {
     brickFolder.add(brickParameters, 'height', 0, 2.00);
     brickFolder.add(brickParameters, 'angle', -1.5, 1.5);
 
+    var brickInterlock = gui.addFolder('brick interlock');
+    brickInterlock.add(bottomRec, 'w', 0., 2.5);
+    brickInterlock.add(bottomRec, 'h', 0., 2.5);
+    brickInterlock.add(topRec, 'w', 0., 2.5);
+    brickInterlock.add(topRec, 'h', 0., 2.5);
+    brickInterlock.add(topRec, 's', 0., 2.5);
+    brickInterlock.add(interlock, "thickness", 0, .5);
+
     var folder5 = gui.addFolder('shader');
     folder5.add(shader, 'type', [
         "clouded",
@@ -281,6 +305,9 @@ var drawScene = function () {
     shaderProgram.SetUniform1f("alpha", transformation.rz);
     shaderProgram.SetUniformVec3("mvVec", [transformation.x, transformation.y, transformation.z]);
 
+    shaderProgram.SetUniformVec3("recA", [topRec.w, topRec.s, topRec.h]);
+    shaderProgram.SetUniformVec3("recB", [bottomRec.w, bottomRec.s, bottomRec.h]);
+    shaderProgram.SetUniform1f("interlockThickness", interlock.thickness);
     // Tell WebGL to draw the scene
     mesh.Draw();
 }

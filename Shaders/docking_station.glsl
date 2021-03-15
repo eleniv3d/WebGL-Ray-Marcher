@@ -39,6 +39,27 @@ vec3 alphaCST = vec3(cos(a), sin(a), tan(a));
 const vec4 sdPA = vec4(0,0,1,0);
 vec4 sdPB = vec4(0,0,-1,h);
 
+// interlock area
+uniform vec3 recA;
+uniform vec3 recB;
+uniform float interlockThickness;
+
+vec2 recCAA = vec2(-recA.x*.5, recA.y);
+vec2 recCAB = vec2(recA.x*.5, recA.y + recA.z);
+
+vec2 recCptA = .5 * (recCAA + recCAB);
+vec2 recCA = recCAB - recCptA;
+
+vec2 recCBA = vec2(-recB.x*.5, recB.y);
+vec2 recCBB = vec2(recB.x*.5, recB.y + recB.z);
+
+vec2 recCptB = .5 * (recCBA + recCBB);
+vec2 recCB = recCBB - recCptB;
+
+float triH = (recCAA.y - recCBB.y) / (1. - recB.x/recA.x);
+vec2 triC = vec2(0., recA.y-triH);
+vec2 triWH = vec2(recA.x*.5, triH);
+
 const float backgroundD = MAX_DIST*.5;
 // const vec3 backgroundColor = vec3(0.07058823529411765, 0.0392156862745098, 0.5607843137254902);
 // const vec3 objColor = vec3(0.6627450980392157, 0.06666666666666667, 0.00392156862745098);
@@ -90,6 +111,17 @@ float sdPlane(vec3 p, vec4 pln){
     return dot(p,pln.xyz) - pln.w;
 }
 
+float sdTriangleIsosceles(in vec2 p, in vec2 q)
+{
+    p.x = abs(p.x);
+    vec2 a = p - q*clamp( dot(p,q)/dot(q,q), 0.0, 1.0 );
+    vec2 b = p - q*vec2( clamp( p.x/q.x, 0.0, 1.0 ), 1.0 );
+    float s = -sign( q.y );
+    vec2 d = min( vec2( dot(a,a), s*(p.x*q.y-p.y*q.x) ),
+                  vec2( dot(b,b), s*(p.y-q.y)  ));
+    return -sqrt(d.x)*sign(d.y);
+}
+
 mat2 Rot(float a) {
     float s = sin(a);
     float c = cos(a);
@@ -106,13 +138,6 @@ float smin(float a, float b, float k) {
     return mix(b, a, h) - k * h * (1.0 - h);
 }
 
-// float sdBands(vec3 p) {
-//     float val = mod(p.y, doubleBH);
-//     val -= bandHeight;
-//     val = sqrt(squareBH - val * val);
-//     return -val;
-// }
-
 float sdGyroid(vec3 p, float scale) {
     p *= scale;
     float d = dot(sin(p), cos(p.yzx) );
@@ -126,25 +151,6 @@ float sdCone( vec3 p, vec2 c )
     vec2 q = vec2( length(p.xz), -p.y );
     float d = length(q-c*max(dot(q,c), 0.0));
     return abs(d * ((q.x*c.y-q.y*c.x<0.0)?-1.0:1.0));
-}
-
-float sdCookie(vec3 p) {
-    // vec2 baseVec = vec2(5,2);
-
-    float sdTR = sdTaperedRec(p, wL, alphaCST);
-    float dBox = sdRec(p.xy, wL - vec2(th));
-    
-    float sdPA = sdPlane(p, sdPA);
-    float sdPB = sdPlane(p, sdPB);
-
-    float dP = -max(sdPA, sdPB);
-
-    float d = min(dBox, sdTR);
-    d = max(-dP, d);
-    // d = max(sdPA, -d);
-    // d = max(sdPB, -d);
-
-    return d;
 }
 
 // float sdRoundCookie(vec3 p) {
@@ -179,6 +185,38 @@ float sdBox(vec3 p, vec3 cPt) {
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+float sdCookieSplit(vec3 p) {
+    float dPlane = sdPlane(p, vec4(0,1,0,0));
+    float dRecA = sdRec(p.xy - recCptA, recCA);
+    float dRecB = sdRec(p.xy - recCptB, recCB);
+    float dTri = sdTriangleIsosceles(p.xy - triC, triWH);
+
+    float d = min(min(dPlane, dTri), min(dRecA, dRecB));
+    // float d = min(dRecA, dRecB);
+    // d = min(dTri, d);
+    return d;
+}
+
+float sdCookie(vec3 p) {
+    // vec2 baseVec = vec2(5,2);
+
+    float sdTR = sdTaperedRec(p, wL, alphaCST);
+    float dBox = sdRec(p.xy, wL - vec2(th));
+    
+    float sdPA = sdPlane(p, sdPA);
+    float sdPB = sdPlane(p, sdPB);
+
+    float dP = -max(sdPA, sdPB);
+
+    float d = min(dBox, sdTR);
+    // float d = sdCookieSplit(p);
+    d = max(-dP, d);
+    // d = max(sdPA, -d);
+    // d = max(sdPB, -d);
+
+    return d;
+}
+
 float GetDist(vec3 p) {
     p = pointTransformation(p)+mvVec;
     // return sdCookie(p);
@@ -189,7 +227,8 @@ float GetDist(vec3 p) {
     // d+=sdBands(p);
     // return d*globalScale;
     
-    return sdCookie(p);
+    return max(sdCookie(p), -(abs(sdCookieSplit(p)) - interlockThickness));
+    // return sdCookie(p);
 }
 
 float RayMarch(vec3 ro, vec3 rd) {
