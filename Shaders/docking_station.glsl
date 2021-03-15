@@ -44,21 +44,55 @@ uniform vec3 recA;
 uniform vec3 recB;
 uniform float interlockThickness;
 
-vec2 recCAA = vec2(-recA.x*.5, recA.y);
-vec2 recCAB = vec2(recA.x*.5, recA.y + recA.z);
+// geometry pairs in function of the thickness
+void geoFromRecs(vec3 rA, vec3 rB, float th, out vec2 rAcPt, out vec2 rAC, out vec2 rBcPt, out vec2 rBC, out vec2 tcPt, out vec2 tC, out vec4 bPln) {
+    // defining the base recs
+    vec2 recCAA = vec2(-rA.x*.5, rA.y);
+    vec2 recCAB = vec2(rA.x*.5, rA.y + rA.z);
 
-vec2 recCptA = .5 * (recCAA + recCAB);
-vec2 recCA = recCAB - recCptA;
+    rAcPt = vec2(0., rA.y - .5*rA.z);
+    rAC = recCAB - rAcPt;
 
-vec2 recCBA = vec2(-recB.x*.5, recB.y);
-vec2 recCBB = vec2(recB.x*.5, recB.y + recB.z);
+    vec2 recCBA = vec2(-rB.x*.5, rB.y);
+    vec2 recCBB = vec2(rB.x*.5, rB.y + rB.z);
 
-vec2 recCptB = .5 * (recCBA + recCBB);
-vec2 recCB = recCBB - recCptB;
+    rBcPt = .5 * (recCBA + recCBB);
+    rBC = recCBB - rBcPt;
 
-float triH = (recCAA.y - recCBB.y) / (1. - recB.x/recA.x);
-vec2 triC = vec2(0., recA.y-triH);
-vec2 triWH = vec2(recA.x*.5, triH);
+    float triH = (recCAA.y - recCBB.y) / (1. - rB.x/rA.x);
+    tcPt = vec2(0., rA.y-triH);
+    tC = vec2(rA.x*.5, triH);
+
+    float thicknessShift = th / atan(tC.y / tC.x);
+
+    // // offsetting all the points
+    // rAcPt.y+=thicknessShift*.5;
+    // rAC+=vec2(th);
+
+    // rBcPt.y+=th-thicknessShift;
+    // rBC+=vec2(thicknessShift, th + thicknessShift);
+
+    // tC+=vec2(th, 2. * thicknessShift);
+    // bPln.w-=th;
+}
+
+vec2 rAPosC;
+vec2 rAPosCpt;
+vec2 rBPosC;
+vec2 rBPosCpt;
+vec2 tPosC;
+vec2 tPosCpt;
+vec4 bPlnPos = vec4(0,1,0,0);
+
+vec2 rANegC;
+vec2 rANegCpt;
+vec2 rBNegC;
+vec2 rBNegCpt;
+vec2 tNegC;
+vec2 tNegCpt;
+vec4 bPlnNeg = vec4(0,1,0,0);
+
+// geoFromRecs(recA, recB, interlockThickness, rANegC, rANegCpt, rBNegC, rBNegCpt, tNegCpt, tNegC, bPlnNeg);
 
 const float backgroundD = MAX_DIST*.5;
 // const vec3 backgroundColor = vec3(0.07058823529411765, 0.0392156862745098, 0.5607843137254902);
@@ -186,13 +220,13 @@ float sdBox(vec3 p, vec3 cPt) {
 }
 
 float sdCookieSplit(vec3 p) {
-    float dPlane = sdPlane(p, vec4(0,1,0,0));
-    float dRecA = sdRec(p.xy - recCptA, recCA);
-    float dRecB = sdRec(p.xy - recCptB, recCB);
-    float dTri = sdTriangleIsosceles(p.xy - triC, triWH);
+    float dPlane = sdPlane(p, bPlnPos);
+    float dRecA = sdRec(p.xy - rAPosCpt, rAPosC);
+    float dRecB = sdRec(p.xy - rBPosCpt, rBPosC);
+    float dTri = sdTriangleIsosceles(p.xy - tPosCpt, tPosC);
 
-    float d = min(min(dPlane, dTri), min(dRecA, dRecB));
-    // float d = min(dRecA, dRecB);
+    // float d = min(min(dPlane, dTri), min(dRecA, dRecB));
+    float d = min(dRecA, dRecB);
     // d = min(dTri, d);
     return d;
 }
@@ -208,8 +242,8 @@ float sdCookie(vec3 p) {
 
     float dP = -max(sdPA, sdPB);
 
-    float d = min(dBox, sdTR);
-    // float d = sdCookieSplit(p);
+    // float d = min(dBox, sdTR);
+    float d = sdCookieSplit(p);
     d = max(-dP, d);
     // d = max(sdPA, -d);
     // d = max(sdPB, -d);
@@ -219,6 +253,7 @@ float sdCookie(vec3 p) {
 
 float GetDist(vec3 p) {
     p = pointTransformation(p)+mvVec;
+    geoFromRecs(recA, recB, interlockThickness, rAPosC, rAPosCpt, rBPosC, rBPosCpt, tPosCpt, tPosC, bPlnPos);
     // return sdCookie(p);
     p*=globalScale;
     // float d=sdRoundCookie(p);
@@ -227,8 +262,8 @@ float GetDist(vec3 p) {
     // d+=sdBands(p);
     // return d*globalScale;
     
-    return max(sdCookie(p), -(abs(sdCookieSplit(p)) - interlockThickness));
-    // return sdCookie(p);
+    // return max(sdCookie(p), -sdCookieSplit(p));
+    return sdCookie(p);
 }
 
 float RayMarch(vec3 ro, vec3 rd) {
@@ -287,7 +322,7 @@ vec3 R(vec2 uv, vec3 p, vec3 l, float z) {
 }
 
 void main()
-{
+{   
     vec2 uv = (gl_FragCoord.xy - .5 * resolution.xy) / resolution.y;
     vec2 m = mousePosition / resolution.xy;
 
