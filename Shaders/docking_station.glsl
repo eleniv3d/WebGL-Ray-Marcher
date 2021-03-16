@@ -1,8 +1,8 @@
-#define MAX_STEPS 500
+#define MAX_STEPS 1000
 #define MAX_DIST 500.
 #define SURF_DIST .001
 #define TAU 6.283185
-#define UNDERSTEP .5
+#define UNDERSTEP .2
 
 // webgl parameters
 precision mediump float;
@@ -40,57 +40,58 @@ const vec4 sdPA = vec4(0,0,1,0);
 vec4 sdPB = vec4(0,0,-1,h);
 
 // interlock area
-uniform vec3 recA;
-uniform vec3 recB;
+uniform vec3 rA;
+uniform vec3 rB;
 uniform float interlockThickness;
 
 // geometry pairs in function of the thickness
-void geoFromRecs(vec3 rA, vec3 rB, float th, out vec2 rAcPt, out vec2 rAC, out vec2 rBcPt, out vec2 rBC, out vec2 tcPt, out vec2 tC, out vec4 bPln) {
-    // defining the base recs
-    vec2 recCAA = vec2(-rA.x*.5, rA.y);
-    vec2 recCAB = vec2(rA.x*.5, rA.y + rA.z);
 
-    rAcPt = vec2(0., rA.y - .5*rA.z);
-    rAC = recCAB - rAcPt;
+// defining the base recs
+vec2 recCAA = vec2(-rA.x*.5, rA.y);
+vec2 recCAB = vec2(rA.x*.5, rA.y + rA.z);
 
-    vec2 recCBA = vec2(-rB.x*.5, rB.y);
-    vec2 recCBB = vec2(rB.x*.5, rB.y + rB.z);
+vec2 rAcPt = vec2(0., rA.y - .5*rA.z);
+vec2 rAC = recCAB - rAcPt;
 
-    rBcPt = .5 * (recCBA + recCBB);
-    rBC = recCBB - rBcPt;
+vec2 recCBA = vec2(-rB.x*.5, rB.y);
+vec2 recCBB = vec2(rB.x*.5, rB.y + rB.z);
 
-    float triH = (recCAA.y - recCBB.y) / (1. - rB.x/rA.x);
-    tcPt = vec2(0., rA.y-triH);
-    tC = vec2(rA.x*.5, triH);
+vec2 rBcPt = .5 * (recCBA + recCBB);
+vec2 rBC = recCBB - rBcPt;
 
-    float thicknessShift = th / atan(tC.y / tC.x);
+float triH = (recCAA.y - recCBB.y) / (1. - rB.x/rA.x);
+vec2 tcPt = vec2(0., rA.y-triH);
+vec2 tC = vec2(rA.x*.5, triH);
 
-    // // offsetting all the points
-    // rAcPt.y+=thicknessShift*.5;
-    // rAC+=vec2(th);
+float thicknessShift = interlockThickness / atan(tC.y / tC.x);
 
-    // rBcPt.y+=th-thicknessShift;
-    // rBC+=vec2(thicknessShift, th + thicknessShift);
+vec2 rAPosC = vec2(rAC.x + interlockThickness, rAC.y + interlockThickness);
+vec2 rAPosCpt = vec2(rAcPt.x, rAcPt.y+thicknessShift*.5);
+vec2 rBPosC = vec2(rBC.x + thicknessShift, rBC.y + interlockThickness + thicknessShift);
+vec2 rBPosCpt = vec2(rBcPt.x, rBcPt.y + interlockThickness-thicknessShift);
+vec2 tPosC = vec2(tC.x + interlockThickness, tC.y + 2. * thicknessShift);
+vec2 tPosCpt = vec2(tcPt);
+vec4 bPlnPos = vec4(0,1,0,-interlockThickness);
 
-    // tC+=vec2(th, 2. * thicknessShift);
-    // bPln.w-=th;
-}
+vec2 rANegC = vec2(rAC);
+vec2 rANegCpt = vec2(rAcPt);
+vec2 rBNegC = vec2(rBC);
+vec2 rBNegCpt = vec2(rBcPt);
+vec2 tNegC = vec2(tC);
+vec2 tNegCpt = vec2(tcPt);
+vec4 bPlnNeg = vec4(0,1,0,interlockThickness);
 
-vec2 rAPosC;
-vec2 rAPosCpt;
-vec2 rBPosC;
-vec2 rBPosCpt;
-vec2 tPosC;
-vec2 tPosCpt;
-vec4 bPlnPos = vec4(0,1,0,0);
+// offsetting all the points
+// rAPosCpt=vec2(rAPosCpt.x, rAPosCpt.y+thicknessShift*.5);
+// rAPosC+=vec2(interlockThickness);
+// rBPosC+=vec2(thicknessShift, interlockThickness + thicknessShift);
+// tPosC+=vec2(interlockThickness, 2. * thicknessShift);
 
-vec2 rANegC;
-vec2 rANegCpt;
-vec2 rBNegC;
-vec2 rBNegCpt;
-vec2 tNegC;
-vec2 tNegCpt;
-vec4 bPlnNeg = vec4(0,1,0,0);
+// rANegCpt.y-=thicknessShift*.5;
+// rANegC-=vec2(interlockThickness);
+// rBNegCpt.y-=interlockThickness-thicknessShift;
+// rBNegC-=vec2(thicknessShift, interlockThickness + thicknessShift);
+// tNegC-=vec2(interlockThickness, 2. * thicknessShift);
 
 // geoFromRecs(recA, recB, interlockThickness, rANegC, rANegCpt, rBNegC, rBNegCpt, tNegCpt, tNegC, bPlnNeg);
 
@@ -223,12 +224,45 @@ float sdCookieSplit(vec3 p) {
     float dPlane = sdPlane(p, bPlnPos);
     float dRecA = sdRec(p.xy - rAPosCpt, rAPosC);
     float dRecB = sdRec(p.xy - rBPosCpt, rBPosC);
-    float dTri = sdTriangleIsosceles(p.xy - tPosCpt, tPosC);
+    float dTri = sdTriangleIsosceles(p.xy - tNegCpt, tNegC);
 
     // float d = min(min(dPlane, dTri), min(dRecA, dRecB));
     float d = min(dRecA, dRecB);
     // d = min(dTri, d);
+    // return d;
+    // return min(dPlane, dTri);
+    return dTri;
+}
+
+float sdSchwarP(vec3 p, float scale) {
+    p *= scale;
+    p = cos(p);
+    float d = p.x + p.y + p.z;
+    d *= .3333;
     return d;
+}
+
+float sdSchwarD(vec3 p, float scale) {
+    p *= scale;
+    vec3 s = sin(p);
+    vec3 c = cos(p);
+
+    float d = (
+        s.x * s.y * c.z + 
+        s.x * c.y * c.z + 
+        c.x * s.y * c.z + 
+        c.x * c.y * s.z 
+    );
+
+    d *= .25;
+
+    return d;
+}
+
+float sdPattern(vec3 p) {
+    p -= pScales;
+    float d_g = sdGyroid(p, fScales.x * sdGyroid(p, fScales.y));// * sdSchwarD(p, fScales.z)));
+    return d_g;
 }
 
 float sdCookie(vec3 p) {
@@ -241,10 +275,11 @@ float sdCookie(vec3 p) {
     float sdPB = sdPlane(p, sdPB);
 
     float dP = -max(sdPA, sdPB);
+    float dPat = sdPattern(p);
 
-    // float d = min(dBox, sdTR);
-    float d = sdCookieSplit(p);
-    d = max(-dP, d);
+    float d = min(dBox, sdTR);
+    // float d = sdCookieSplit(p);
+    d = max(-dP, max(d, -dPat));
     // d = max(sdPA, -d);
     // d = max(sdPB, -d);
 
@@ -253,7 +288,6 @@ float sdCookie(vec3 p) {
 
 float GetDist(vec3 p) {
     p = pointTransformation(p)+mvVec;
-    geoFromRecs(recA, recB, interlockThickness, rAPosC, rAPosCpt, rBPosC, rBPosCpt, tPosCpt, tPosC, bPlnPos);
     // return sdCookie(p);
     p*=globalScale;
     // float d=sdRoundCookie(p);
