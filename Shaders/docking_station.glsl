@@ -39,6 +39,10 @@ vec3 alphaCST = vec3(cos(a), sin(a), tan(a));
 const vec4 sdPA = vec4(0,0,1,0);
 vec4 sdPB = vec4(0,0,-1,h);
 
+// plane pattern
+float pth = (th.x-h)*.5;
+vec4 patPln = vec4(0,0,1,pth+th.x);
+
 // interlock area
 uniform vec3 rA;
 uniform vec3 rB;
@@ -267,9 +271,11 @@ float sdSchwarD(vec3 p, float scale) {
 }
 
 float sdPattern(vec3 p) {
+    float pd = sdPlane(p, patPln);
+    float pmag = pth - pd;
     p -= pScales;
     float d_g = sdGyroid(p, fScales.x * sdGyroid(p, fScales.y));// * sdSchwarD(p, fScales.z)));
-    return d_g;
+    return min(d_g, pmag);
 }
 
 float sdCookie(vec3 p) {
