@@ -305,8 +305,8 @@ var drawScene = function () {
     shaderProgram.SetUniform1f("alpha", transformation.rz);
     shaderProgram.SetUniformVec3("mvVec", [transformation.x, transformation.y, transformation.z]);
 
-    shaderProgram.SetUniformVec3("recA", [topRec.w, topRec.s, topRec.h]);
-    shaderProgram.SetUniformVec3("recB", [bottomRec.w, bottomRec.s, bottomRec.h]);
+    shaderProgram.SetUniformVec3("rA", [topRec.w, topRec.s, topRec.h]);
+    shaderProgram.SetUniformVec3("rB", [bottomRec.w, bottomRec.s, bottomRec.h]);
     shaderProgram.SetUniform1f("interlockThickness", interlock.thickness);
     // Tell WebGL to draw the scene
     mesh.Draw();

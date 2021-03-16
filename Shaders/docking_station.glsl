@@ -41,7 +41,7 @@ vec4 sdPB = vec4(0,0,-1,h);
 
 // plane pattern
 float pth = (th.x-h)*.5;
-vec4 patPln = vec4(0,0,1,pth+th.x);
+vec4 patPln = vec4(0,0,1,th.x);
 
 // interlock area
 uniform vec3 rA;
@@ -136,6 +136,8 @@ float sdCapsule( vec3 p, vec3 a, vec3 b, float r )
   float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
   return length( pa - ba*h ) - r;
 }
+
+float sdCap
 
 float sdLine(vec2 p, vec2 a, vec2 b) {
     float d=distance(a, b);
@@ -271,11 +273,13 @@ float sdSchwarD(vec3 p, float scale) {
 }
 
 float sdPattern(vec3 p) {
-    float pd = sdPlane(p, patPln);
-    float pmag = pth - pd;
+    float pd = abs(sdPlane(p, patPln))/pth+1.;
+    // float pmag = pd - pth;
+    // pd = clamp(pd, -1., 1.);
     p -= pScales;
     float d_g = sdGyroid(p, fScales.x * sdGyroid(p, fScales.y));// * sdSchwarD(p, fScales.z)));
-    return min(d_g, pmag);
+    float d = max(d_g,pd);
+    return d;
 }
 
 float sdCookie(vec3 p) {
@@ -311,6 +315,7 @@ float GetDist(vec3 p) {
     
     // return max(sdCookie(p), -sdCookieSplit(p));
     return sdCookie(p);
+    // return sdPattern(p);
 }
 
 float RayMarch(vec3 ro, vec3 rd) {
