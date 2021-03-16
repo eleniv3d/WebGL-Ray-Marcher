@@ -126,6 +126,13 @@ float sdTaperedRec(vec3 p, vec2 cPt, vec3 alfaCST) {
     return sdRec(p.xy, cPt)*alfaCST.z;
 }
 
+float sdCapsule( vec3 p, vec3 a, vec3 b, float r )
+{
+  vec3 pa = p - a, ba = b - a;
+  float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+  return length( pa - ba*h ) - r;
+}
+
 float sdLine(vec2 p, vec2 a, vec2 b) {
     float d=distance(a, b);
     float l2 = d*d;
