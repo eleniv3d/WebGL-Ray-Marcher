@@ -253,15 +253,7 @@ var initCanvas = function () {
     var folder5 = gui.addFolder('shader');
     folder5.add(shader, 'type', [
         "gyroid",
-        "mandelbulb",
-        "spheres",
-        "clouded",
-        "indexedGyroid",
-        "schwarzDPPGradient",
-        "schwarzDPPIndexed",
-        "gyroidSmooth",
-        "schwarzDPPSmooth",
-        "brickShader"
+        "cca"
     ]).onChange( function () {
         switchShader(shader);
     });
@@ -341,26 +333,10 @@ var drawScene = function () {
 
 function switchShader() {
 
-    if (shader.type == "mandelbulb") {
+    if (shader.type == "cca") {
         frag = 'fragShader2'
     } else if (shader.type == "gyroid") {
         frag = 'fragShader'
-    } else if (shader.type == "spheres") {
-        frag = 'fragShader3'
-    } else if (shader.type == "clouded") {
-        frag = 'fragShader4'
-    } else if (shader.type == "indexedGyroid") {
-        frag = 'gyroidIndexed'
-    } else if (shader.type == "schwarzDPPIndexed") {
-        frag = 'schwarzDPPIndexed'
-    } else if (shader.type == "schwarzDPPGradient") {
-        frag = 'schwarzDPPGradient'
-    } else if (shader.type == "schwarzDPPSmooth") {
-        frag = 'schwarzDPPSmooth'
-    } else if (shader.type == "gyroidSmooth") {
-        frag = 'gyroidSmooth'
-    } else if (shader.type == "brickShader") {
-        frag = 'brickShader'
     }
     shaderProgram = new Shader('vertShader', frag);
     // Activate the shader program
